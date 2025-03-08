@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF;
+  --font: #2D2D2D;
+  --font-red: #FF0000;
+  --input-bg: #F4F4F4;
+  --input-icon: #FF0000;
+  --input-border: #FF0000;
+  --input-border-error: #FF5252;
+  --red: #FF0000;
+  --line: #e9e9e9;
+  --box-shadow: #00000033;
+}
+
+.dark {
+  --background: #151515;
+  --font: #F2F2F2;
+  --font-red: #FF0000;
+  --input-bg: #1F1F1F;
+  --input-icon: #FF0000;
+  --input-border: #FF0000;
+  --input-border-error: #FF5252;
+  --red: #FF0000;
+  --box-shadow: #FF0000;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--font);
+  font-family: Inter, sans-serif;
+}
+
+.search-input {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  background-color: var(--input-bg);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  color: var(--font);
+  border: 1px solid var(--input-border);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--red);
+}
+
+.search-input::placeholder {
+  font-family: sans-serif;
+}
+
+.playButton {
+  border-radius: 9999px;
+  background-color: #fee2e2;
+  padding: 12px;
+  transition: background-color 0.2s;
+}
+
+.playButton:hover {
+  background-color: #fecaca;
+}
+
+.playButton svg {
+  width: 24px;
+  height: 24px;
+  color: #dc2626;
+}
+
+.wordType::after {
+  content: '';
+  margin-top: 8px;
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: #e5e7eb;
+}
+
+.meaningList li::before {
+  content: '•';
+  margin-right: 8px;
+  color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .searchInput {
+    height: 3rem;
+  }
+
+  .playButton {
+    padding: 8px;
+  }
+
+  .playButton svg {
+    width: 20px;
+    height: 20px;
+  }
+}
