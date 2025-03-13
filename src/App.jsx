@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BookOpen, ChevronDown, Globe, Search, Volume2 } from 'lucide-react';
 import { JLPT_DATA, EXAMPLE_SENTENCES, POPULAR_WORDS } from './data';
+import Header from './components/Header';
+import LoginForm from './LoginForm';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +13,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [language, setLanguage] = useState('english');
+  const [showLoginForm, setShowLoginForm] = useState(false);
   const levelDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
 
@@ -173,89 +176,33 @@ function App() {
     setSearchTerm('');
   };
 
+  const handleLoginClick = () => {
+    setShowLoginForm(true);
+  };
+
+  const handleCloseLoginForm = () => {
+    setShowLoginForm(false);
+  };
+
   return (
     <div className="app">
-      <header className="header">
-        <div className="container">
-          <div className="header-content">
-            <a href="/" onClick={handleReset} className="logo">
-              <BookOpen className="logo-icon" />
-              <div>
-                <h1 className="logo-text">
-                  <span>Japan</span>Easy
-                </h1>
-                <p>日本語辞書</p>
-              </div>
-            </a>
-
-            <form onSubmit={handleSearch} className="search-form">
-              <input
-                type="text"
-                className="search-input"
-                placeholder={translations.searchPlaceholder}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                disabled={isLoading}
-              />
-              <button type="submit" className="search-button" disabled={isLoading}>
-                <Search />
-              </button>
-            </form>
-
-            <div className="controls">
-              <div className="dropdown" ref={languageDropdownRef}>
-                <button
-                  className="dropdown-button language-button"
-                  onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-                >
-                  <Globe />
-                  {language === 'english' ? 'English' : 'Tiếng Việt'}
-                  <ChevronDown />
-                </button>
-                {languageDropdownOpen && (
-                  <div className="dropdown-content">
-                    <button
-                      onClick={() => handleLanguageSelect('english')}
-                      className="dropdown-item"
-                    >
-                      English
-                    </button>
-                    <button
-                      onClick={() => handleLanguageSelect('vietnamese')}
-                      className="dropdown-item"
-                    >
-                      Tiếng Việt
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="dropdown" ref={levelDropdownRef}>
-                <button
-                  className="dropdown-button level-button"
-                  onClick={() => setLevelDropdownOpen(!levelDropdownOpen)}
-                >
-                  {selectedLevel || translations.selectLevel}
-                  <ChevronDown />
-                </button>
-                {levelDropdownOpen && (
-                  <div className="dropdown-content">
-                    {levels.map((level) => (
-                      <button
-                        key={level}
-                        onClick={() => handleLevelSelect(level)}
-                        className="dropdown-item"
-                      >
-                        {level}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header 
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        handleSearch={handleSearch}
+        isLoading={isLoading}
+        language={language}
+        setLanguage={setLanguage}
+        languageDropdownOpen={languageDropdownOpen}
+        setLanguageDropdownOpen={setLanguageDropdownOpen}
+        selectedLevel={selectedLevel}
+        setSelectedLevel={setSelectedLevel}
+        levelDropdownOpen={levelDropdownOpen}
+        setLevelDropdownOpen={setLevelDropdownOpen}
+        handleReset={handleReset}
+        translations={translations}
+        onLoginClick={handleLoginClick}
+      />
 
       <main className="main">
         <div className="container">
@@ -412,6 +359,15 @@ function App() {
           <p>{translations.attributionText.substring(0, 150)}...</p>
         </div>
       </footer>
+
+      {showLoginForm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="close-button" onClick={handleCloseLoginForm}>×</button>
+            <LoginForm />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
