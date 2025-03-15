@@ -480,7 +480,7 @@ body {
 }
 
 .login-input-field {
-  width: 82%;
+  width: 100%;
   padding: 12px 40px;
   border: 1.5px solid var(--border-color);
   border-radius: 8px;

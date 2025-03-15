@@ -3,6 +3,7 @@ import { BookOpen, ChevronDown, Globe, Search, Volume2 } from 'lucide-react';
 import { JLPT_DATA, EXAMPLE_SENTENCES, POPULAR_WORDS } from './data';
 import Header from './components/Header';
 import LoginForm from './LoginForm';
+import Sidebar from './components/SideBar.jsx';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -224,7 +225,7 @@ function App() {
                   </button>
                 </div>
               </div>
-
+              <Sidebar />
               <section>
                 <h2>{translations.popularWords}</h2>
                 <div className="kanji-grid">
