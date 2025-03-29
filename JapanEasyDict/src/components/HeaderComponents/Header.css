@@ -69,7 +69,15 @@
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+}
+
+.dropdown-button svg:last-child {
+    transition: transform 0.2s ease;
+}
+
+.dropdown-button:hover {
+    filter: brightness(0.95);
 }
 
 .language-button {
@@ -86,14 +94,25 @@
 
 .dropdown-content {
     position: absolute;
-    top: calc(100% + 4px);
+    top: calc(100% + 8px);
     right: 0;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px var(--box-shadow-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     min-width: 160px;
     z-index: 10;
     overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-content.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .dropdown-item {
@@ -106,11 +125,42 @@
     font-size: 0.875rem;
     color: var(--text-color);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.dropdown-item:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .dropdown-item:hover {
-    background: var(--background-light);    
+    background: var(--background-light);
+    color: var(--primary-color);
+    padding-left: 20px;
+}
+
+.dropdown-item:active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Thêm mũi tên nhỏ phía trên dropdown */
+.dropdown-content::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: 20px;
+    width: 10px;
+    height: 10px;
+    background: white;
+    transform: rotate(45deg);
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Xoay mũi tên khi dropdown mở */
+.dropdown.active .dropdown-button svg:last-child {
+    transform: rotate(180deg);
 }
 
 .header .login-button {

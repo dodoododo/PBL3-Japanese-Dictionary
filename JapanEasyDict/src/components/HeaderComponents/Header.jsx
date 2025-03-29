@@ -52,7 +52,7 @@ const Header = ({
           </form>
 
           <div className="controls">
-            <div className="dropdown" ref={languageDropdownRef}>
+            <div className={`dropdown ${languageDropdownOpen ? 'active' : ''}`} ref={languageDropdownRef}>
               <button
                 className="dropdown-button language-button"
                 onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
@@ -61,25 +61,29 @@ const Header = ({
                 {language === 'english' ? 'English' : 'Tiếng Việt'}
                 <ChevronDown />
               </button>
-              {languageDropdownOpen && (
-                <div className="dropdown-content">
-                  <button
-                    onClick={() => setLanguage('english')}
-                    className="dropdown-item"
-                  >
-                    English
-                  </button>
-                  <button
-                    onClick={() => setLanguage('vietnamese')}
-                    className="dropdown-item"
-                  >
-                    Tiếng Việt
-                  </button>
-                </div>
-              )}
+              <div className={`dropdown-content ${languageDropdownOpen ? 'show' : ''}`}>
+                <button
+                  onClick={() => {
+                    setLanguage('english');
+                    setLanguageDropdownOpen(false);
+                  }}
+                  className="dropdown-item"
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => {
+                    setLanguage('vietnamese');
+                    setLanguageDropdownOpen(false);
+                  }}
+                  className="dropdown-item"
+                >
+                  Tiếng Việt
+                </button>
+              </div>
             </div>
 
-            <div className="dropdown" ref={levelDropdownRef}>
+            <div className={`dropdown ${levelDropdownOpen ? 'active' : ''}`} ref={levelDropdownRef}>
               <button
                 className="dropdown-button level-button"
                 onClick={() => setLevelDropdownOpen(!levelDropdownOpen)}
@@ -87,19 +91,20 @@ const Header = ({
                 {selectedLevel || translations.selectLevel}
                 <ChevronDown />
               </button>
-              {levelDropdownOpen && (
-                <div className="dropdown-content">
-                  {levels.map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setSelectedLevel(level)}
-                      className="dropdown-item"
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className={`dropdown-content ${levelDropdownOpen ? 'show' : ''}`}>
+                {levels.map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => {
+                      setSelectedLevel(level);
+                      setLevelDropdownOpen(false);
+                    }}
+                    className="dropdown-item"
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <button 
