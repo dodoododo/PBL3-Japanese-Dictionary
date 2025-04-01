@@ -5,17 +5,19 @@ import { BookOpen, ChevronLeft, Menu,
          HelpCircle, LogOut } from 'lucide-react';
 import './Sidebar.css';
 
-const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true);;
+const Sidebar = ({ onToggle }) => {
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [openDropdowns, setOpenDropdowns] = useState({});
 
   useEffect(() => {
     const handleResize = () => {
-      setIsCollapsed(window.innerWidth <= 1024);
+      const newIsCollapsed = window.innerWidth <= 1024;
+      setIsCollapsed(newIsCollapsed);
+      onToggle?.(newIsCollapsed);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [onToggle]);
 
   const toggleDropdown = (id) => {
     setOpenDropdowns(prev => ({
@@ -27,6 +29,7 @@ const Sidebar = () => {
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
     setOpenDropdowns({});
+    onToggle?.(!isCollapsed);
   };
 
   const DropdownItem = ({ title, items }) => (
