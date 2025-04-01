@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, ChevronLeft, Menu, 
          LayoutDashboard, Calendar, Bell, 
          BookMarked, Settings,
-         HelpCircle, LogOut } from 'lucide-react';
+         HelpCircle, LogOut, Clipboard , NotepadText } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ onToggle }) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState({});
 
   useEffect(() => {
@@ -75,32 +75,8 @@ const Sidebar = ({ onToggle }) => {
           <ul className="nav-list primary-nav">
             <li className="nav-item">
               <a href="#" className="nav-link">
-                <LayoutDashboard className="nav-icon" />
-                <span className="nav-label">Dashboard</span>
-              </a>
-            </li>
-
-            <DropdownItem 
-              title="Services" 
-              items={['IT Consulting', 'Cloud Solutions', 'Mobile Apps']} 
-            />
-
-            <li className="nav-item">
-              <a href="#" className="nav-link">
-                <Bell className="nav-icon" />
-                <span className="nav-label">Notifications</span>
-              </a>
-            </li>
-
-            <DropdownItem 
-              title="Bookmarks" 
-              items={['Saved Tutorials', 'Favorite Blogs', 'Resource Guides']} 
-            />
-
-            <li className="nav-item">
-              <a href="#" className="nav-link">
-                
-                <span className="nav-label">Extensions</span>
+              <NotepadText className="nav-icon" />
+                <span className="nav-label">Flashcards</span>
               </a>
             </li>
 

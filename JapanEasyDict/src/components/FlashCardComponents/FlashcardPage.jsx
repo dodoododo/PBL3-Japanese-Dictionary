@@ -38,7 +38,7 @@ function FlashcardPage() {
   }
 
   return (  
-    <div className="container">    
+    <div className="flashcard-container">    
       {flashcards.length > 0 && <Flashcard flashcard={flashcards[currentIndex]} />}
       <div className="button-container">
         <button className="btn" onClick={prevQuestion}>Previous Question</button>
