@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Flashcard from './Flashcard.jsx';
 import './Flashcard.css';
 
-function FlashcardPage() {
+const FlashcardPage = () => {
   const [flashcards, setFlashcards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -38,7 +38,7 @@ function FlashcardPage() {
   }
 
   return (  
-    <div className="container">    
+    <div className="flashcard-container">    
       {flashcards.length > 0 && <Flashcard flashcard={flashcards[currentIndex]} />}
       <div className="button-container">
         <button className="btn" onClick={prevQuestion}>Previous Question</button>

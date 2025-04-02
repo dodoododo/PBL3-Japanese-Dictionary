@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2 } from 'lucide-react';
 import { JLPT_DATA, EXAMPLE_SENTENCES, POPULAR_WORDS } from './data';
 import Header from './components/HeaderComponents/Header';
 import LoginForm from './components/LoginFormComponents/LoginForm';
 import Sidebar from './components/SideBarComponents/SideBar';
+import FlashcardPage from './components/FlashCardComponents/FlashcardPage';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -186,190 +188,197 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <Header 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        handleSearch={handleSearch}
-        isLoading={isLoading}
-        language={language}
-        setLanguage={setLanguage}
-        languageDropdownOpen={languageDropdownOpen}
-        setLanguageDropdownOpen={setLanguageDropdownOpen}
-        selectedLevel={selectedLevel}
-        setSelectedLevel={setSelectedLevel}
-        levelDropdownOpen={levelDropdownOpen}
-        setLevelDropdownOpen={setLevelDropdownOpen}
-        handleReset={handleReset}
-        translations={translations}
-        onLoginClick={handleLoginClick}
-      />
+    <Router>
+      <div className="app">
+        <Header 
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          handleSearch={handleSearch}
+          isLoading={isLoading}
+          language={language}
+          setLanguage={setLanguage}
+          languageDropdownOpen={languageDropdownOpen}
+          setLanguageDropdownOpen={setLanguageDropdownOpen}
+          selectedLevel={selectedLevel}
+          setSelectedLevel={setSelectedLevel}
+          levelDropdownOpen={levelDropdownOpen}
+          setLevelDropdownOpen={setLevelDropdownOpen}
+          handleReset={handleReset}
+          translations={translations}
+          onLoginClick={handleLoginClick}
+        />
 
-      <Sidebar onToggle={(isCollapsed) => {
-        const mainContainer = document.querySelector('.main-container');
-        if (mainContainer) {
-          if (window.innerWidth <= 768) {
-            mainContainer.classList.toggle('sidebar-visible', !isCollapsed);
-          } else {
-            mainContainer.classList.toggle('sidebar-collapsed', isCollapsed);
+        <Sidebar onToggle={(isCollapsed) => {
+          const mainContainer = document.querySelector('.main-container');
+          if (mainContainer) {
+            if (window.innerWidth <= 768) {
+              mainContainer.classList.toggle('sidebar-visible', !isCollapsed);
+            } else {
+              mainContainer.classList.toggle('sidebar-collapsed', isCollapsed);
+            }
           }
-        }
-      }} />
-      
-      <div className="main-container">
-        <main className="main">
-          <div className="container">
-            {!selectedLevel && !searchResult && !isLoading && !noResults && (
-              <div>
-                <div className="welcome">
-                  <h1>{translations.welcome}</h1>
-                  <p>{translations.welcomeDesc}</p>
-                </div>
+        }} />
+        
+        <div className="main-container">
+          <main className="main">
+            <div className="container">
+              <Routes>
+                <Route path="/" element={
+                  !selectedLevel && !searchResult && !isLoading && !noResults && (
+                    <div>
+                      <div className="welcome">
+                        <h1>{translations.welcome}</h1>
+                        <p>{translations.welcomeDesc}</p>
+                      </div>
+                      <section>
+                        <h2>{translations.popularWords}</h2>
+                        <div className="kanji-grid">
+                          {POPULAR_WORDS.map((word, index) => (
+                            <div
+                              key={index}
+                              className="kanji-card"
+                              onClick={() => {
+                                setSearchTerm(word.word);
+                                handleSearch(new Event('submit'));
+                              }}
+                            >
+                              <div className="kanji-character">{word.word}</div>
+                              <div>{word.reading} - {word.meaning}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+
+                      <section>
+                        <h2>{translations.attribution}</h2>
+                        <p>{translations.attributionText}</p>
+                      </section>
+                    </div>
+                  )
+                } />
+                <Route exact path="/flashcards" element={<FlashcardPage />} />
+              </Routes>
+
+              {selectedLevel && !searchResult && !isLoading && !noResults && (
                 <section>
-                  <h2>{translations.popularWords}</h2>
+                  <h2>JLPT {selectedLevel} {translations.kanjiList}</h2>
                   <div className="kanji-grid">
-                    {POPULAR_WORDS.map((word, index) => (
+                    {JLPT_DATA[selectedLevel].map((kanji, index) => (
                       <div
                         key={index}
                         className="kanji-card"
                         onClick={() => {
-                          setSearchTerm(word.word);
+                          setSearchTerm(kanji.kanji);
                           handleSearch(new Event('submit'));
                         }}
                       >
-                        <div className="kanji-character">{word.word}</div>
-                        <div>{word.reading} - {word.meaning}</div>
+                        <div className="kanji-character">{kanji.kanji}</div>
+                        <div>{kanji.meaning}</div>
                       </div>
                     ))}
                   </div>
                 </section>
+              )}
 
-                <section>
-                  <h2>{translations.attribution}</h2>
-                  <p>{translations.attributionText}</p>
-                </section>
-              </div>
-            )}
+              {isLoading ? (
+                <div className="loading">
+                  <p>{translations.searching}</p>
+                </div>
+              ) : noResults ? (
+                <div className="no-results">
+                  <p>😕</p>
+                  <h2>{translations.noResults}</h2>
+                  <p>{translations.noResultsDesc}</p>
+                </div>
+              ) : searchResult && (
+                <div className="result">
+                  <div className="word-header">
+                    <div className="word-title">
+                      <h2 className="word-text">
+                        {searchResult.japanese[0].word || searchResult.japanese[0].reading}
+                      </h2>
+                      <button
+                        className="pronunciation-button"
+                        onClick={() => playPronunciation(searchResult.japanese[0].word || searchResult.japanese[0].reading)}
+                        aria-label="Play pronunciation"
+                      >
+                        <Volume2 />
+                      </button>
+                    </div>
+                    <div className="reading">
+                      {searchResult.japanese.map((item, index) => (
+                        <span key={index} className="reading-item">
+                          {item.reading}
+                        </span>
+                      ))}
+                    </div>
+                    {searchResult.is_common && (
+                      <span className="common-tag">{translations.commonWord}</span>
+                    )}
+                    {searchResult.jlpt.length > 0 && (
+                      <p className="jlpt-level">
+                        {translations.jlptLevel} {searchResult.jlpt[0].toUpperCase()}
+                      </p>
+                    )}
+                  </div>
 
-            {selectedLevel && !searchResult && !isLoading && !noResults && (
-              <section>
-                <h2>JLPT {selectedLevel} {translations.kanjiList}</h2>
-                <div className="kanji-grid">
-                  {JLPT_DATA[selectedLevel].map((kanji, index) => (
-                    <div
-                      key={index}
-                      className="kanji-card"
-                      onClick={() => {
-                        setSearchTerm(kanji.kanji);
-                        handleSearch(new Event('submit'));
-                      }}
-                    >
-                      <div className="kanji-character">{kanji.kanji}</div>
-                      <div>{kanji.meaning}</div>
+                  {searchResult.senses.map((sense, index) => (
+                    <div key={index} className="meanings">
+                      <h3>{translations.meaning}</h3>
+                      <ul className="meanings-list">
+                        {sense.english_definitions.map((def, i) => (
+                          <li key={i}>{def}</li>
+                        ))}
+                      </ul>
+                      {sense.parts_of_speech.length > 0 && (
+                        <p className="parts-of-speech">
+                          {sense.parts_of_speech.join(', ')}
+                        </p>
+                      )}
+
+                      {searchResult.japanese[0].word && (
+                        <div className="examples">
+                          <h3>{translations.examples}</h3>
+                          {getExampleSentences(searchResult.japanese[0].word).length > 0 ? (
+                            <div className="examples-list">
+                              {getExampleSentences(searchResult.japanese[0].word).map((example, i) => (
+                                <div key={i} className="example-card">
+                                  <p className="example-japanese">{example.japanese}</p>
+                                  <p className="example-romaji">{example.romaji}</p>
+                                  <p className="example-english">{example.english}</p>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p>No example sentences available.</p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
-              </section>
-            )}
+              )}
+            </div>
+          </main>
+        </div>
 
-            {isLoading ? (
-              <div className="loading">
-                <p>{translations.searching}</p>
-              </div>
-            ) : noResults ? (
-              <div className="no-results">
-                <p>😕</p>
-                <h2>{translations.noResults}</h2>
-                <p>{translations.noResultsDesc}</p>
-              </div>
-            ) : searchResult && (
-              <div className="result">
-                <div className="word-header">
-                  <div className="word-title">
-                    <h2 className="word-text">
-                      {searchResult.japanese[0].word || searchResult.japanese[0].reading}
-                    </h2>
-                    <button
-                      className="pronunciation-button"
-                      onClick={() => playPronunciation(searchResult.japanese[0].word || searchResult.japanese[0].reading)}
-                      aria-label="Play pronunciation"
-                    >
-                      <Volume2 />
-                    </button>
-                  </div>
-                  <div className="reading">
-                    {searchResult.japanese.map((item, index) => (
-                      <span key={index} className="reading-item">
-                        {item.reading}
-                      </span>
-                    ))}
-                  </div>
-                  {searchResult.is_common && (
-                    <span className="common-tag">{translations.commonWord}</span>
-                  )}
-                  {searchResult.jlpt.length > 0 && (
-                    <p className="jlpt-level">
-                      {translations.jlptLevel} {searchResult.jlpt[0].toUpperCase()}
-                    </p>
-                  )}
-                </div>
-
-                {searchResult.senses.map((sense, index) => (
-                  <div key={index} className="meanings">
-                    <h3>{translations.meaning}</h3>
-                    <ul className="meanings-list">
-                      {sense.english_definitions.map((def, i) => (
-                        <li key={i}>{def}</li>
-                      ))}
-                    </ul>
-                    {sense.parts_of_speech.length > 0 && (
-                      <p className="parts-of-speech">
-                        {sense.parts_of_speech.join(', ')}
-                      </p>
-                    )}
-
-                    {searchResult.japanese[0].word && (
-                      <div className="examples">
-                        <h3>{translations.examples}</h3>
-                        {getExampleSentences(searchResult.japanese[0].word).length > 0 ? (
-                          <div className="examples-list">
-                            {getExampleSentences(searchResult.japanese[0].word).map((example, i) => (
-                              <div key={i} className="example-card">
-                                <p className="example-japanese">{example.japanese}</p>
-                                <p className="example-romaji">{example.romaji}</p>
-                                <p className="example-english">{example.english}</p>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p>No example sentences available.</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+        <footer className="footer">
+          <div className="footer-container">
+            <p>© 2025 JapanEasy - {language === 'english' ? 'Japanese Dictionary' : 'Từ điển tiếng Nhật'}</p>
+            <p>{translations.attributionText.substring(0, 150)}...</p>
           </div>
-        </main>
+        </footer>
+
+        {showLoginForm && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <button className="close-button" onClick={handleCloseLoginForm}>×</button>
+              <LoginForm />
+            </div>
+          </div>
+        )}
       </div>
-
-      <footer className="footer">
-        <div className="container">
-          <p>© 2025 JapanEasy - {language === 'english' ? 'Japanese Dictionary' : 'Từ điển tiếng Nhật'}</p>
-          <p>{translations.attributionText.substring(0, 150)}...</p>
-        </div>
-      </footer>
-
-      {showLoginForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="close-button" onClick={handleCloseLoginForm}>×</button>
-            <LoginForm />
-          </div>
-        </div>
-      )}
-    </div>
+    </Router>
   );
 }
 
