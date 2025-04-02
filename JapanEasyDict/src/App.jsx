@@ -256,7 +256,7 @@ function App() {
                     </div>
                   )
                 } />
-                <Route path="/flashcards" element={<FlashcardPage />} />
+                <Route exact path="/flashcards" element={<FlashcardPage />} />
               </Routes>
 
               {selectedLevel && !searchResult && !isLoading && !noResults && (

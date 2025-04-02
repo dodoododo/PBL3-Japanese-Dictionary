@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Flashcard from './Flashcard.jsx';
 import './Flashcard.css';
 
-function FlashcardPage() {
+const FlashcardPage = () => {
   const [flashcards, setFlashcards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
