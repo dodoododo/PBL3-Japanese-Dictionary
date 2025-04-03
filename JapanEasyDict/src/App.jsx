@@ -6,6 +6,8 @@ import Header from './components/HeaderComponents/Header';
 import LoginForm from './components/LoginFormComponents/LoginForm';
 import Sidebar from './components/SideBarComponents/SideBar';
 import FlashcardPage from './components/FlashCardComponents/FlashcardPage';
+import JLPTPage from './components/JLPTComponents/JLPTPage';
+import KanjiList from './components/JLPTComponents/KanjiList';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -256,29 +258,11 @@ function App() {
                     </div>
                   )
                 } />
-                <Route exact path="/flashcards" element={<FlashcardPage />} />
+                <Route path="/jlpt" element={<JLPTPage />} />
+                <Route path="/kanji/:level" element={<KanjiList />} />
+                <Route path="/flashcards" element={<FlashcardPage />} />
+                <Route path="/flashcards/:level" element={<FlashcardPage />} />
               </Routes>
-
-              {selectedLevel && !searchResult && !isLoading && !noResults && (
-                <section>
-                  <h2>JLPT {selectedLevel} {translations.kanjiList}</h2>
-                  <div className="kanji-grid">
-                    {JLPT_DATA[selectedLevel].map((kanji, index) => (
-                      <div
-                        key={index}
-                        className="kanji-card"
-                        onClick={() => {
-                          setSearchTerm(kanji.kanji);
-                          handleSearch(new Event('submit'));
-                        }}
-                      >
-                        <div className="kanji-character">{kanji.kanji}</div>
-                        <div>{kanji.meaning}</div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
 
               {isLoading ? (
                 <div className="loading">

@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2, LogIn } from 'lucide-react';
 import "./Header.css"
 
@@ -19,9 +20,24 @@ const Header = ({
   translations,
   onLoginClick
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const levelDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
   const levels = ['N1', 'N2', 'N3', 'N4', 'N5'];
+
+  // Reset selectedLevel khi URL thay đổi, trừ khi đang ở trang kanji
+  useEffect(() => {
+    if (!location.pathname.includes('/kanji/')) {
+      setSelectedLevel('');
+    }
+  }, [location.pathname, setSelectedLevel]);
+
+  const handleLevelSelect = (level) => {
+    setSelectedLevel(level);
+    setLevelDropdownOpen(false);
+    navigate(`/kanji/${level.toLowerCase()}`);
+  };
 
   return (
     <header className="header">
@@ -95,10 +111,7 @@ const Header = ({
                 {levels.map((level) => (
                   <button
                     key={level}
-                    onClick={() => {
-                      setSelectedLevel(level);
-                      setLevelDropdownOpen(false);
-                    }}
+                    onClick={() => handleLevelSelect(level)}
                     className="dropdown-item"
                   >
                     {level}
