@@ -2,10 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2 } from 'lucide-react';
 import { JLPT_DATA, EXAMPLE_SENTENCES, POPULAR_WORDS } from './data';
+import { isAuthenticated } from './auth';
 import Header from './components/HeaderComponents/Header';
 import LoginForm from './components/LoginFormComponents/LoginForm';
 import Sidebar from './components/SideBarComponents/SideBar';
 import FlashcardPage from './components/FlashCardComponents/FlashcardPage';
+import JLPTPage from './components/JLPTComponents/JLPTPage';
+import KanjiList from './components/JLPTComponents/KanjiList';
+import AdminPage from './components/AdminComponents/AdminPage';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +21,8 @@ function App() {
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [language, setLanguage] = useState('english');
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const levelDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
 
@@ -86,6 +92,15 @@ function App() {
     if (savedLanguage === 'english' || savedLanguage === 'vietnamese') {
       setLanguage(savedLanguage);
     }
+  }, []);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const authStatus = isAuthenticated();
+      setIsLoggedIn(authStatus);
+      setIsAdmin(localStorage.getItem('isAdmin') === 'true');
+    };
+    checkAuth();
   }, []);
 
   const playPronunciation = (word) => {
@@ -179,11 +194,9 @@ function App() {
     setSearchTerm('');
   };
 
-  const handleLoginClick = () => {
-    setShowLoginForm(true);
-  };
-
-  const handleCloseLoginForm = () => {
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setIsAdmin(localStorage.getItem('isAdmin') === 'true');
     setShowLoginForm(false);
   };
 
@@ -205,7 +218,11 @@ function App() {
           setLevelDropdownOpen={setLevelDropdownOpen}
           handleReset={handleReset}
           translations={translations}
-          onLoginClick={handleLoginClick}
+          onLoginClick={() => setShowLoginForm(true)}
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}
+          isAdmin={isAdmin}
+          setIsAdmin={setIsAdmin}
         />
 
         <Sidebar onToggle={(isCollapsed) => {
@@ -256,29 +273,12 @@ function App() {
                     </div>
                   )
                 } />
-                <Route exact path="/flashcards" element={<FlashcardPage />} />
+                <Route path="/jlpt" element={<JLPTPage />} />
+                <Route path="/kanji/:level" element={<KanjiList />} />
+                <Route path="/flashcards" element={<FlashcardPage />} />
+                <Route path="/flashcards/:level" element={<FlashcardPage />} />
+                <Route path="/admin" element={<AdminPage />} />
               </Routes>
-
-              {selectedLevel && !searchResult && !isLoading && !noResults && (
-                <section>
-                  <h2>JLPT {selectedLevel} {translations.kanjiList}</h2>
-                  <div className="kanji-grid">
-                    {JLPT_DATA[selectedLevel].map((kanji, index) => (
-                      <div
-                        key={index}
-                        className="kanji-card"
-                        onClick={() => {
-                          setSearchTerm(kanji.kanji);
-                          handleSearch(new Event('submit'));
-                        }}
-                      >
-                        <div className="kanji-character">{kanji.kanji}</div>
-                        <div>{kanji.meaning}</div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
 
               {isLoading ? (
                 <div className="loading">
@@ -372,8 +372,8 @@ function App() {
         {showLoginForm && (
           <div className="modal-overlay">
             <div className="modal-content">
-              <button className="close-button" onClick={handleCloseLoginForm}>×</button>
-              <LoginForm />
+              <button className="close-button" onClick={() => setShowLoginForm(false)}>×</button>
+              <LoginForm onLoginSuccess={handleLoginSuccess} />
             </div>
           </div>
         )}
