@@ -370,12 +370,10 @@ function App() {
         </footer>
 
         {showLoginForm && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <button className="close-button" onClick={() => setShowLoginForm(false)}>×</button>
-              <LoginForm onLoginSuccess={handleLoginSuccess} />
-            </div>
-          </div>
+          <LoginForm 
+            onLoginSuccess={handleLoginSuccess} 
+            onClose={() => setShowLoginForm(false)} 
+          />
         )}
       </div>
     </Router>
