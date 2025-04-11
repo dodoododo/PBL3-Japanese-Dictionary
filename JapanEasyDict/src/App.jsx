@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2 } from 'lucide-react';
 import { JLPT_DATA, EXAMPLE_SENTENCES, POPULAR_WORDS } from './data';
-import { isAuthenticated } from './auth';
+import { isAuthenticated, isAdmin,  login, logout} from './auth';
 import Header from './components/HeaderComponents/Header';
 import LoginForm from './components/LoginFormComponents/LoginForm';
 import Sidebar from './components/SideBarComponents/SideBar';
@@ -10,6 +10,7 @@ import FlashcardPage from './components/FlashCardComponents/FlashcardPage';
 import JLPTPage from './components/JLPTComponents/JLPTPage';
 import KanjiList from './components/JLPTComponents/KanjiList';
 import AdminPage from './components/AdminComponents/AdminPage';
+import './auth.js'
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -278,6 +279,7 @@ function App() {
                 <Route path="/flashcards" element={<FlashcardPage />} />
                 <Route path="/flashcards/:level" element={<FlashcardPage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/login" element={<LoginForm />} />
               </Routes>
 
               {isLoading ? (

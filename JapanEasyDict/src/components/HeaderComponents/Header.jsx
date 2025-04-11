@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2, LogIn, LogOut, Shield } from 'lucide-react';
 import { isAuthenticated, logout } from '../../auth';
-import "./Header.css"
+import "./Header.css";
+import LoginForm from '../LoginFormComponents/LoginForm';
 
 const Header = ({ 
   searchTerm, 
@@ -33,6 +34,10 @@ const Header = ({
     setIsLoggedIn(isAuthenticated());
     setIsAdmin(localStorage.getItem('isAdmin') === 'true');
   }, [location.pathname]);
+
+  const logInOnClick = () => {
+    navigate('/login');
+  }
 
   const handleLogout = () => {
     logout();
@@ -163,7 +168,7 @@ const Header = ({
                 className="login-button"
                 onClick={onLoginClick}
               >
-                <LogIn className="login-icon" />
+                <LogIn className="login-icon"/>
                 {language === 'english' ? 'Login' : 'Đăng nhập'}
               </button>
             )}

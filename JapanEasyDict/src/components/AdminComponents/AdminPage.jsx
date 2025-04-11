@@ -80,35 +80,10 @@ const AdminPage = () => {
     setKanjiList(updatedList);
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="admin-container">
-        <h1>Đăng nhập quản trị</h1>
-        <form onSubmit={handleLogin} className="login-form">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Mật khẩu"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && <p className="error-message">{error}</p>}
-          <button type="submit">Đăng nhập</button>
-        </form>
-      </div>
-    );
-  }
-
   return (
     <div className="admin-container">
       <div className="admin-header">
         <h1>Trang Quản Trị</h1>
-        <button onClick={handleLogout} className="logout-button">Đăng xuất</button>
       </div>
       
       <div className="level-selector">
@@ -148,7 +123,7 @@ const AdminPage = () => {
 
       <div className="kanji-list">
         <h2>Danh sách Kanji</h2>
-        <table>
+        <table className="kanji-display">
           <thead>
             <tr>
               <th>Kanji</th>
