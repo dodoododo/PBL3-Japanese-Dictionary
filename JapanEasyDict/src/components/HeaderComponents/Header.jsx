@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2, LogIn, LogOut, Shield } from 'lucide-react';
 import { isAuthenticated, logout } from '../../auth';
-import "./Header.css"
+import "./Header.css";
+import LoginForm from '../LoginFormComponents/LoginForm';
 
 const Header = ({ 
   searchTerm, 
@@ -28,11 +29,16 @@ const Header = ({
   const levels = ['N1', 'N2', 'N3', 'N4', 'N5'];
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
     setIsAdmin(localStorage.getItem('isAdmin') === 'true');
   }, [location.pathname]);
+
+  const logInOnClick = () => {
+    navigate('/login');
+  }
 
   const handleLogout = () => {
     logout();
@@ -42,6 +48,7 @@ const Header = ({
   };
 
   const handleAdminClick = () => {
+    setUserDropdownOpen(false);
     navigate('/admin');
   };
 
@@ -140,29 +147,42 @@ const Header = ({
             </div>
 
             {isLoggedIn ? (
-              <div className="user-controls">
-                {isAdmin && (
-                  <button 
-                    className="admin-button"
-                    onClick={handleAdminClick}
-                  >
-                    <Shield className="admin-icon" />
-                    Quản trị
-                  </button>
-                )}
-                <button 
-                  className="logout-button"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="logout-icon" />
-                  Đăng xuất
+              <div className="user-dropdown">
+                <button className="avatar-button" onClick={() => setUserDropdownOpen(!userDropdownOpen)}>
+                  <img src="/Pictures/DangThienBinh.jpg" alt="avatar" className="user-avatar" />
                 </button>
+                {userDropdownOpen && (
+                  <div className="user-menu">
+                    <div className="user-info">
+                      <img src="/Pictures/DangThienBinh.jpg" alt="avatar" className="user-avatar-large" />
+                      <div>
+                        <div className="user-name">Ngọc Hậu</div>
+                        <div className="user-id">ID: 1852702</div>
+                      </div>
+                    </div>
+                    <button className="edit-profile-button">
+                      ✏️ Chỉnh sửa hồ sơ
+                    </button>
+                    {isAdmin && (
+                      <button 
+                        className="admin-button"
+                        onClick={handleAdminClick}
+                      >
+                        <Shield className="admin-icon" />Quản trị
+                      </button>
+                    )}
+                    <button 
+                      className="logout-button"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="logout-icon" />
+                      Đăng xuất
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              <button 
-                className="login-button"
-                onClick={onLoginClick}
-              >
+              <button className="login-button" onClick={onLoginClick}>
                 <LogIn className="login-icon" />
                 {language === 'english' ? 'Login' : 'Đăng nhập'}
               </button>
