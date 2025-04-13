@@ -65,7 +65,7 @@ const KanjiList = () => {
     <div className="kanji-list-container">
       <h1 className="jlpt-title">JLPT {normalizedLevel} - Danh sách Kanji</h1>
       
-      <div className="kanji-list">
+      <div className="kanji-list-pagination">
         {currentKanji.map((kanji, index) => (
           <div key={index} className="kanji-item">
             <div className="kanji-character">{kanji.kanji}</div>

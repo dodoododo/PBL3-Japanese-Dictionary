@@ -22,6 +22,7 @@ body {
 }
 .sidebar.collapsed {
   width: 83px;
+  pointer-events: none; 
 }
 .sidebar .sidebar-header {
   display: flex;
@@ -40,6 +41,7 @@ body {
 
 .header-logo {
   left: 20px;
+  pointer-events: auto;
 }
 
 
@@ -58,6 +60,7 @@ body {
   justify-content: center;
   border-radius: 8px;
   transition: 0.4s ease;
+  pointer-events: auto;
 }
 .sidebar.collapsed .sidebar-header .sidebar-toggler {
   transform: translate(-4px, 65px);
@@ -202,6 +205,7 @@ body {
   }
   
   .sidebar:not(.collapsed) {
+    pointer-events: auto;
     left: 0;
   }
   
@@ -216,4 +220,12 @@ body {
     background: #151A2D;
     z-index: 1001;
   }
+}
+
+.chevron-icon {
+  transition: transform 1s ease;
+}
+
+.chevron-icon.rotate {
+  transform: rotate(180deg);
 }

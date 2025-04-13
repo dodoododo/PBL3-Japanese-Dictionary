@@ -67,8 +67,8 @@ const Sidebar = ({ onToggle }) => {
           <a href="#" className="header-logo">
             <BookOpen size={46} />
           </a>
-            <button className="sidebar-toggler" onClick={toggleSidebar}>
-            <ChevronLeft />
+          <button className="sidebar-toggler" onClick={toggleSidebar}>
+            <ChevronLeft size={10000} className={`chevron-icon ${isCollapsed ? 'rotate' : ''}`} />
           </button>
         </header>
 
