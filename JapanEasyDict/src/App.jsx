@@ -20,7 +20,7 @@ function App() {
   const [selectedLevel, setSelectedLevel] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
-  const [language, setLanguage] = useState('english');
+  const [language, setLanguage] = useState('vietnamese');
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -113,67 +113,60 @@ function App() {
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
-
+  
     setIsLoading(true);
     setNoResults(false);
     setSearchResult(null);
-
+  
     try {
-      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-      const targetUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(searchTerm)}`;
-      
-      const response = await fetch(proxyUrl + targetUrl, {
-        headers: {
-          'Origin': window.location.origin
-        }
-      });
-
+      // Gọi BE
+      const response = await fetch(`http://localhost:8082/api/words/${searchTerm}`);
+  
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('Không tìm thấy từ trong database');
       }
-
+  
       const data = await response.json();
-      
-      if (data.data && data.data.length > 0) {
-        setSearchResult(data.data[0]);
+      console.log(searchResult);
+      if (data) {
+        setSearchResult(data);
       } else {
         setNoResults(true);
       }
     } catch {
+      // Nếu không có trong DB, gọi Jisho
       try {
         const response = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(searchTerm)}`);
+  
         if (!response.ok) {
-          throw new Error('Word not found');
+          throw new Error('Word not found on Jisho');
         }
+  
         const data = await response.json();
+        if (!data.data || data.data.length === 0) {
+          throw new Error('Không có kết quả');
+        }
+  
+        const wordData = data.data[0];
         const formattedResult = {
           slug: searchTerm,
-          is_common: true,
-          tags: [],
-          jlpt: [],
-          japanese: [{
-            reading: data[0].word,
-            word: data[0].word
-          }],
-          senses: [{
-            english_definitions: data[0].meanings.map(m => m.definitions[0]),
-            parts_of_speech: data[0].meanings.map(m => m.partOfSpeech),
-            tags: [],
-            see_also: [],
-            antonyms: [],
-            source: [],
-            info: []
-          }]
+          is_common: wordData.is_common,
+          tags: wordData.tags,
+          jlpt: wordData.jlpt,
+          japanese: wordData.japanese,
+          senses: wordData.senses,
         };
+  
         setSearchResult(formattedResult);
       } catch (error) {
         setNoResults(true);
-        console.error('Search error:', error);
+        console.error('Lỗi tìm từ từ Jisho:', error);
       }
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleLevelSelect = (level) => {
     setSelectedLevel(level);
@@ -276,7 +269,6 @@ function App() {
                 } />
                 <Route path="/jlpt" element={<JLPTPage />} />
                 <Route path="/kanji/:level" element={<KanjiList />} />
-                <Route path="/flashcards" element={<FlashcardPage />} />
                 <Route path="/flashcards/:level" element={<FlashcardPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/login" element={<LoginForm />} />
@@ -297,67 +289,36 @@ function App() {
                   <div className="word-header">
                     <div className="word-title">
                       <h2 className="word-text">
-                        {searchResult.japanese[0].word || searchResult.japanese[0].reading}
+                        {searchResult.word || searchResult.reading}
                       </h2>
                       <button
                         className="pronunciation-button"
-                        onClick={() => playPronunciation(searchResult.japanese[0].word || searchResult.japanese[0].reading)}
+                        onClick={() => playPronunciation(searchResult.word || searchResult.reading)}
                         aria-label="Play pronunciation"
                       >
                         <Volume2 />
                       </button>
                     </div>
                     <div className="reading">
-                      {searchResult.japanese.map((item, index) => (
-                        <span key={index} className="reading-item">
-                          {item.reading}
-                        </span>
-                      ))}
+                      <span className="reading-item">
+                        {searchResult.reading}
+                      </span>
                     </div>
-                    {searchResult.is_common && (
-                      <span className="common-tag">{translations.commonWord}</span>
-                    )}
-                    {searchResult.jlpt.length > 0 && (
-                      <p className="jlpt-level">
-                        {translations.jlptLevel} {searchResult.jlpt[0].toUpperCase()}
+                    {searchResult.partOfSpeech && (
+                      <p className="parts-of-speech">
+                        {typeof searchResult.partOfSpeech === 'string'
+                          ? searchResult.partOfSpeech
+                          : searchResult.partOfSpeech?.name || 'N/A'}
                       </p>
                     )}
                   </div>
-
-                  {searchResult.senses.map((sense, index) => (
-                    <div key={index} className="meanings">
-                      <h3>{translations.meaning}</h3>
-                      <ul className="meanings-list">
-                        {sense.english_definitions.map((def, i) => (
-                          <li key={i}>{def}</li>
-                        ))}
-                      </ul>
-                      {sense.parts_of_speech.length > 0 && (
-                        <p className="parts-of-speech">
-                          {sense.parts_of_speech.join(', ')}
-                        </p>
-                      )}
-
-                      {searchResult.japanese[0].word && (
-                        <div className="examples">
-                          <h3>{translations.examples}</h3>
-                          {getExampleSentences(searchResult.japanese[0].word).length > 0 ? (
-                            <div className="examples-list">
-                              {getExampleSentences(searchResult.japanese[0].word).map((example, i) => (
-                                <div key={i} className="example-card">
-                                  <p className="example-japanese">{example.japanese}</p>
-                                  <p className="example-romaji">{example.romaji}</p>
-                                  <p className="example-english">{example.english}</p>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p>No example sentences available.</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+              
+                  <div className="meanings">
+                    <h3>{translations.meaning}</h3>
+                    <ul className="meanings-list">
+                      <li>{searchResult.meaning}</li>
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>

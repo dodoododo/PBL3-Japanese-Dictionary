@@ -94,7 +94,7 @@ const Header = ({
           </form>
 
           <div className="controls">
-            <div className={`dropdown ${languageDropdownOpen ? 'active' : ''}`} ref={languageDropdownRef}>
+            {/* <div className={`dropdown ${languageDropdownOpen ? 'active' : ''}`} ref={languageDropdownRef}>
               <button
                 className="dropdown-button language-button"
                 onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
@@ -123,7 +123,7 @@ const Header = ({
                   Tiếng Việt
                 </button>
               </div>
-            </div>
+            </div> */}
 
             <div className={`dropdown ${levelDropdownOpen ? 'active' : ''}`} ref={levelDropdownRef}>
               <button
