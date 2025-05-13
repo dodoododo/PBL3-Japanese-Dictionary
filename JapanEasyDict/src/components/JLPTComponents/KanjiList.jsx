@@ -63,14 +63,14 @@ const KanjiList = () => {
 
   return (
     <div className="kanji-list-container">
-      <h1 className="jlpt-title">JLPT {normalizedLevel} - Danh sách Kanji</h1>
+      <h1 className="jlpt-title">JLPT {normalizedLevel} - Kanji List</h1>
       
       <div className="kanji-list-pagination">
         {currentKanji.map((kanji, index) => (
           <div key={index} className="kanji-item">
             <div className="kanji-character">{kanji.kanji}</div>
             <div className="kanji-details">
-              <div className="kanji-reading">{kanji.reading}</div>
+              <div className="kanji-list-reading">{kanji.reading}</div>
               <div className="kanji-meaning">{kanji.meaning}</div>
             </div>
           </div>
@@ -84,7 +84,7 @@ const KanjiList = () => {
               className="pagination-button"
               onClick={() => handlePageChange(validatedCurrentPage - 1)}
             >
-              Trang trước
+              Previous
             </button>
           )}
 
@@ -110,7 +110,7 @@ const KanjiList = () => {
               className="pagination-button"
               onClick={() => handlePageChange(validatedCurrentPage + 1)}
             >
-              Trang sau
+              Next
             </button>
           )}
         </div>

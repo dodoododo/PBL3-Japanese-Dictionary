@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, ChevronLeft, Menu, 
          LayoutDashboard, Calendar, Bell, 
          BookMarked, Settings,
-         HelpCircle, LogOut, Clipboard, NotepadText, GraduationCap } from 'lucide-react';         
+         HelpCircle, LogOut, Clipboard, NotepadText, GraduationCap, Joystick } from 'lucide-react';         
 import { Link } from 'react-router-dom';
 import './Sidebar.css';
 
@@ -64,8 +64,8 @@ const Sidebar = ({ onToggle }) => {
       
       <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
         <header className="sidebar-header">
-          <a href="#" className="header-logo">
-            <BookOpen size={46} />
+          <a href="/" className="header-logo">
+            <BookOpen size={46} color="red"  />
           </a>
           <button className="sidebar-toggler" onClick={toggleSidebar}>
             <ChevronLeft size={10000} className={`chevron-icon ${isCollapsed ? 'rotate' : ''}`} />
@@ -89,10 +89,10 @@ const Sidebar = ({ onToggle }) => {
             </li>
 
             <li className="nav-item">
-              <a href="#" className="nav-link">
-                <Settings className="nav-icon" />
-                <span className="nav-label">Settings</span>
-              </a>
+              <Link to="/game" className="nav-link">
+                <Joystick className="nav-icon" />
+                <span className="nav-label">Games</span>
+              </Link>
             </li>
           </ul>
 
