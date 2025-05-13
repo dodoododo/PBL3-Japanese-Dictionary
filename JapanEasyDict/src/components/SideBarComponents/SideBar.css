@@ -5,7 +5,6 @@ body {
   background: linear-gradient(#F1F3FF, #CBD4FF);
 }
 .sidebar {
-  
   position: fixed;
   top: 0;
   left: 0;
@@ -100,7 +99,7 @@ body {
   gap: 12px;
   white-space: nowrap;
   border-radius: 8px;
-  padding: 11px 15px;
+  padding: 11px 2px;
   align-items: center;
   text-decoration: none;
   border: 1px solid #151A2D;

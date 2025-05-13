@@ -499,3 +499,68 @@ export const JLPT_DATA = {
     { word: '花', reading: 'はな', meaning: 'flower' },
     { word: '木', reading: 'き', meaning: 'tree' }
   ];
+
+
+  export const ANALYTICS_DATA = {
+    dailySearches: [
+      { date: 'Mon', searches: 1850 },
+      { date: 'Tue', searches: 2750 },
+      { date: 'Wed', searches: 2100 },
+      { date: 'Thu', searches: 3200 },
+      { date: 'Fri', searches: 2600 },
+      { date: 'Sat', searches: 3400 },
+      { date: 'Sun', searches: 2900 }
+    ],
+    mostSearchedKanji: [
+      { kanji: '愛', searches: 245 },
+      { kanji: '食', searches: 210 },
+      { kanji: '水', searches: 185 },
+      { kanji: '私', searches: 150 },
+      { kanji: '人', searches: 125 }
+    ],
+    userStatistics: {
+      newUsersToday: 24,
+      activeUsers: 1245,
+      totalSearches: 45678,
+      averageSessionTime: '4m 32s'
+    }
+  };
+
+
+  export const WORDS_DATA = {
+    N5: [
+      { word: '言葉', reading: 'ことば', meaning: 'word; language', example: '日本語の言葉を勉強します。' },
+      { word: '辞書', reading: 'じしょ', meaning: 'dictionary', example: '辞書で単語を調べます。' },
+      { word: '勉強', reading: 'べんきょう', meaning: 'study', example: '毎日日本語を勉強します。' },
+      { word: '学校', reading: 'がっこう', meaning: 'school', example: '学校に行きます。' },
+      { word: '先生', reading: 'せんせい', meaning: 'teacher', example: '田中先生は親切です。' }
+    ],
+    N4: [
+      { word: '練習', reading: 'れんしゅう', meaning: 'practice', example: '漢字の練習をします。' },
+      { word: '意味', reading: 'いみ', meaning: 'meaning', example: 'この言葉の意味を教えてください。' },
+      { word: '文法', reading: 'ぶんぽう', meaning: 'grammar', example: '日本語の文法は難しいです。' },
+      { word: '発音', reading: 'はつおん', meaning: 'pronunciation', example: 'この発音は難しいです。' },
+      { word: '単語', reading: 'たんご', meaning: 'vocabulary', example: '新しい単語を覚えます。' }
+    ],
+    N3: [
+      { word: '表現', reading: 'ひょうげん', meaning: 'expression', example: 'この表現はよく使います。' },
+      { word: '文章', reading: 'ぶんしょう', meaning: 'sentence, text', example: '長い文章を書きます。' },
+      { word: '会話', reading: 'かいわ', meaning: 'conversation', example: '日本語で会話をします。' },
+      { word: '翻訳', reading: 'ほんやく', meaning: 'translation', example: '英語から日本語に翻訳します。' },
+      { word: '語彙', reading: 'ごい', meaning: 'vocabulary', example: '語彙力を高めます。' }
+    ],
+    N2: [
+      { word: '熟語', reading: 'じゅくご', meaning: 'idiom, compound word', example: '新しい熟語を学びます。' },
+      { word: '敬語', reading: 'けいご', meaning: 'honorific language', example: '敬語を使って話します。' },
+      { word: '方言', reading: 'ほうげん', meaning: 'dialect', example: '関西の方言を勉強します。' },
+      { word: '語源', reading: 'ごげん', meaning: 'word origin', example: 'この言葉の語源を調べます。' },
+      { word: '慣用句', reading: 'かんようく', meaning: 'idiomatic expression', example: '日本語の慣用句を覚えます。' }
+    ],
+    N1: [
+      { word: '語感', reading: 'ごかん', meaning: 'language intuition', example: '日本語の語感を身につけます。' },
+      { word: '語調', reading: 'ごちょう', meaning: 'tone of speech', example: '優しい語調で話します。' },
+      { word: '語義', reading: 'ごぎ', meaning: 'word meaning', example: '語義を正確に理解します。' },
+      { word: '語法', reading: 'ごほう', meaning: 'usage, grammar', example: '正しい語法を学びます。' },
+      { word: '語用', reading: 'ごよう', meaning: 'pragmatics', example: '語用論を研究します。' }
+    ]
+  };

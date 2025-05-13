@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro&display=swap');
+@import "tailwindcss";
+
+
 
 * {
   margin: 0;
@@ -26,16 +29,18 @@ body {
 
 .container {
   width: 100%;
-  max-width: 1200px;
-  padding: 0 2rem;
+  height: 100%;
 }
 
 .main {
-  width: 100%;
-  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.welcome-page {
+  margin: auto;
+  padding: 0 4rem;
 }
 
 .welcome {
@@ -200,7 +205,6 @@ body {
 .footer {
   background: var(--background-light);
   padding: 2rem 0;
-  margin-top: 3rem;
   margin-left: 200px;
   transition: margin-left 0.4s ease;
 }
@@ -212,7 +216,6 @@ body {
 .footer p {
   text-align: center;
   color: #666;
-  margin-left: 400px;
   font-size: 0.875rem;
   margin: 0.5rem 0;
 }
@@ -331,7 +334,6 @@ body {
 }
 
 .main-container {
-  min-height: 100vh;
   padding-top: 64px;
   margin-left: 200px;
   transition: margin-left 0.4s ease;

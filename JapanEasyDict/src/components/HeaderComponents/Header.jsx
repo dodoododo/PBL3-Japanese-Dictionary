@@ -4,6 +4,8 @@ import { BookOpen, ChevronDown, Globe, Search, Volume2, LogIn, LogOut, Shield } 
 import { isAuthenticated, logout } from '../../auth';
 import "./Header.css";
 import LoginForm from '../LoginFormComponents/LoginForm';
+import { navLinks } from '../data/navLinks';
+import NavLinks from '../NavLinks';
 
 const Header = ({ 
   searchTerm, 
@@ -124,13 +126,20 @@ const Header = ({
                 </button>
               </div>
             </div> */}
+            <ul className="inline-flex space-x-4 my-5 lg:py-3 mr-10 max-w-xl justify-between ml-10 w-[210px]">
+                {
+                    navLinks.map((nav, idx) => {
+                        return <NavLinks key={idx} nav={nav}/>
+                    })
+                }
+            </ul>
 
             <div className={`dropdown ${levelDropdownOpen ? 'active' : ''}`} ref={levelDropdownRef}>
               <button
                 className="dropdown-button level-button"
                 onClick={() => setLevelDropdownOpen(!levelDropdownOpen)}
               >
-                {selectedLevel || translations.selectLevel}
+                Kanji Level
                 <ChevronDown />
               </button>
               <div className={`dropdown-content ${levelDropdownOpen ? 'show' : ''}`}>
@@ -149,26 +158,26 @@ const Header = ({
             {isLoggedIn ? (
               <div className="user-dropdown">
                 <button className="avatar-button" onClick={() => setUserDropdownOpen(!userDropdownOpen)}>
-                  <img src="/Pictures/DangThienBinh.jpg" alt="avatar" className="user-avatar" />
+                  <img src="/Pictures/aa28c0a8-7661-453e-b9f0-d1720455db9d.png" alt="avatar" className="user-avatar" />
                 </button>
                 {userDropdownOpen && (
                   <div className="user-menu">
                     <div className="user-info">
-                      <img src="/Pictures/DangThienBinh.jpg" alt="avatar" className="user-avatar-large" />
+                      <img src="/Pictures/aa28c0a8-7661-453e-b9f0-d1720455db9d.png" alt="avatar" className="user-avatar-large" />
                       <div>
-                        <div className="user-name">Ngọc Hậu</div>
+                        <div className="user-name">Ngọc Hau</div>
                         <div className="user-id">ID: 1852702</div>
                       </div>
                     </div>
                     <button className="edit-profile-button">
-                      ✏️ Chỉnh sửa hồ sơ
+                      ✏️ Edit Profile
                     </button>
                     {isAdmin && (
                       <button 
                         className="admin-button"
                         onClick={handleAdminClick}
                       >
-                        <Shield className="admin-icon" />Quản trị
+                        <Shield className="admin-icon" />Administration
                       </button>
                     )}
                     <button 
@@ -176,7 +185,7 @@ const Header = ({
                       onClick={handleLogout}
                     >
                       <LogOut className="logout-icon" />
-                      Đăng xuất
+                      Logout
                     </button>
                   </div>
                 )}

@@ -9,8 +9,15 @@ import Sidebar from './components/SideBarComponents/SideBar';
 import FlashcardPage from './components/FlashCardComponents/FlashcardPage';
 import JLPTPage from './components/JLPTComponents/JLPTPage';
 import KanjiList from './components/JLPTComponents/KanjiList';
-import AdminPage from './components/AdminComponents/AdminPage';
+import AdminPage from './components/AdminComponents/Admin';
+import SearchResult from "./components/SearchResultsComponents/SearchResult";
+import SearchResultNew from "./components/SearchResultsComponents/SearchResult";
+
+import DnDGame from './components/views/DnDGame.jsx';
+import * as wanakana from 'wanakana';
+
 import './auth.js'
+import Kana from './components/views/Kana.jsx';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,7 +27,7 @@ function App() {
   const [selectedLevel, setSelectedLevel] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
-  const [language, setLanguage] = useState('vietnamese');
+  const [language, setLanguage] = useState('english');
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -119,53 +126,50 @@ function App() {
     setSearchResult(null);
   
     try {
-      // Gọi BE
+      // 1. Gọi backend
       const response = await fetch(`http://localhost:8082/api/words/${searchTerm}`);
   
       if (!response.ok) {
-        throw new Error('Không tìm thấy từ trong database');
+        throw new Error('Không tìm thấy trong DB');
       }
   
       const data = await response.json();
-      console.log(searchResult);
       if (data) {
         setSearchResult(data);
       } else {
         setNoResults(true);
       }
     } catch {
-      // Nếu không có trong DB, gọi Jisho
+      // 2. Nếu fail → fallback sang Jisho API
       try {
         const response = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(searchTerm)}`);
-  
-        if (!response.ok) {
-          throw new Error('Word not found on Jisho');
-        }
+        if (!response.ok) throw new Error('Lỗi từ Jisho');
   
         const data = await response.json();
-        if (!data.data || data.data.length === 0) {
-          throw new Error('Không có kết quả');
-        }
+        if (!data.data || data.data.length === 0) throw new Error('Không có kết quả');
   
         const wordData = data.data[0];
+  
         const formattedResult = {
-          slug: searchTerm,
+          word: wordData.japanese[0]?.word || '',
+          reading: wordData.japanese[0]?.reading || '',
+          partOfSpeech: wordData.senses[0]?.parts_of_speech?.[0] || '',
+          meaning: wordData.senses[0]?.english_definitions?.join(', '),
           is_common: wordData.is_common,
-          tags: wordData.tags,
           jlpt: wordData.jlpt,
-          japanese: wordData.japanese,
-          senses: wordData.senses,
+          senses: wordData.senses
         };
   
         setSearchResult(formattedResult);
       } catch (error) {
         setNoResults(true);
-        console.error('Lỗi tìm từ từ Jisho:', error);
+        console.error('Lỗi từ Jisho:', error);
       }
     } finally {
       setIsLoading(false);
     }
   };
+  
   
 
   const handleLevelSelect = (level) => {
@@ -196,7 +200,7 @@ function App() {
 
   return (
     <Router>
-      <div className="app">
+      <div className="app flex flex-col min-h-screen">
         <Header 
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -230,13 +234,13 @@ function App() {
           }
         }} />
         
-        <div className="main-container">
-          <main className="main">
+        <div className="main-container flex-grow">
+          <main className="main">   
             <div className="container">
               <Routes>
                 <Route path="/" element={
                   !selectedLevel && !searchResult && !isLoading && !noResults && (
-                    <div>
+                    <div className = "welcome-page">
                       <div className="welcome">
                         <h1>{translations.welcome}</h1>
                         <p>{translations.welcomeDesc}</p>
@@ -259,11 +263,6 @@ function App() {
                           ))}
                         </div>
                       </section>
-
-                      <section>
-                        <h2>{translations.attribution}</h2>
-                        <p>{translations.attributionText}</p>
-                      </section>
                     </div>
                   )
                 } />
@@ -272,55 +271,30 @@ function App() {
                 <Route path="/flashcards/:level" element={<FlashcardPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/login" element={<LoginForm />} />
+                <Route path="/hiragana" element={<Kana title="Hiragana" symbol="あ" />} />
+                <Route path="/katakana" element={<Kana title="Katakana" symbol="ア" />} />
+                <Route path="/game" element={<DnDGame />} />
               </Routes>
 
-              {isLoading ? (
-                <div className="loading">
-                  <p>{translations.searching}</p>
-                </div>
-              ) : noResults ? (
-                <div className="no-results">
-                  <p>😕</p>
-                  <h2>{translations.noResults}</h2>
-                  <p>{translations.noResultsDesc}</p>
-                </div>
-              ) : searchResult && (
-                <div className="result">
-                  <div className="word-header">
-                    <div className="word-title">
-                      <h2 className="word-text">
-                        {searchResult.word || searchResult.reading}
-                      </h2>
-                      <button
-                        className="pronunciation-button"
-                        onClick={() => playPronunciation(searchResult.word || searchResult.reading)}
-                        aria-label="Play pronunciation"
-                      >
-                        <Volume2 />
-                      </button>
-                    </div>
-                    <div className="reading">
-                      <span className="reading-item">
-                        {searchResult.reading}
-                      </span>
-                    </div>
-                    {searchResult.partOfSpeech && (
-                      <p className="parts-of-speech">
-                        {typeof searchResult.partOfSpeech === 'string'
-                          ? searchResult.partOfSpeech
-                          : searchResult.partOfSpeech?.name || 'N/A'}
-                      </p>
-                    )}
-                  </div>
+
               
-                  <div className="meanings">
-                    <h3>{translations.meaning}</h3>
-                    <ul className="meanings-list">
-                      <li>{searchResult.meaning}</li>
-                    </ul>
+              {isLoading ? (
+                  <div className="loading">
+                    <p>{translations.searching}</p>
                   </div>
-                </div>
-              )}
+                ) : noResults ? (
+                  <div className="no-results">
+                    <p>😕</p>
+                    <h2>{translations.noResults}</h2>
+                    <p>{translations.noResultsDesc}</p>
+                  </div>
+                ) : searchResult && (
+                  <SearchResult
+                    searchResult={searchResult} 
+                    playPronunciation={playPronunciation} 
+                    translations={translations} 
+                  />
+                )}
             </div>
           </main>
         </div>

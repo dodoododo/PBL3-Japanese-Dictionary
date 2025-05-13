@@ -1,93 +1,131 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import LoginInputField from './LoginInputField';
 import './LoginForm.css';
-import { login } from '../../auth'; 
+import { login } from '../../auth';
 import { useNavigate } from 'react-router-dom';
+import RegisterForm from './RegisterForm';
 
 const LoginForm = ({ onLoginSuccess, onClose }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const result = login(formData.email, formData.password);
     if (result.success) {
-      onLoginSuccess(); 
+      onLoginSuccess();
       window.location.reload();
-      navigate(result.isAdmin ? '/admin' : '/'); 
+      navigate(result.isAdmin ? '/admin' : '/');
     } else {
-      setError(result.message); 
+      setError(result.message);
     }
+  };
+
+  const slideVariants = {
+    initial: (direction) => ({
+      x: direction === 'left' ? 300 : -300,
+      opacity: 0
+    }),
+    animate: {
+      x: 0,
+      opacity: 1,
+      transition: { duration: 0.4 }
+    },
+    exit: (direction) => ({
+      x: direction === 'left' ? -300 : 300,
+      opacity: 0,
+      transition: { duration: 0.4 }
+    })
   };
 
   return (
     <div className="auth-modal-overlay">
-      <div className="auth-modal-content" onClick={e => e.stopPropagation()}>
-        <button className="auth-close-button" onClick={onClose}>
-          <X size={24} />
-        </button>
-        
-        <h2 className="auth-form-title">Đăng nhập với</h2>
-        
-        <div className="auth-social-login">
-          <button className="auth-social-button">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="auth-social-icon" />
-            Google
-          </button>
-        </div>
+      <AnimatePresence mode="wait" initial={false} custom={isLogin ? 'right' : 'left'}>
+        {isLogin ? (
+          <motion.div
+            key="login"
+            className="auth-modal-content"
+            variants={slideVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            custom="right"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="auth-close-button" onClick={onClose}>
+              <X size={24} />
+            </button>
 
-        <div className="auth-separator">
-          <span>hoặc</span>
-        </div>
+            <h2 className="auth-form-title">Đăng nhập với</h2>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <LoginInputField
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            required
-            icon="mail"
-          />
+            <div className="auth-social-login">
+              <button className="auth-social-button">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="auth-social-icon" />
+                Google
+              </button>
+            </div>
 
-          <LoginInputField
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Mật khẩu"
-            required
-            icon="lock"
-          />
+            <div className="auth-separator">
+              <span>hoặc</span>
+            </div>
 
-          <a href="#" className="auth-forgot-link">Quên mật khẩu?</a>
-          
-          {error && <div className="auth-error">{error}</div>}
-          
-          <button type="submit" className="auth-submit-button">
-            Đăng nhập
-          </button>
-        </form>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <LoginInputField
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email"
+                required
+                icon="mail"
+              />
+              <LoginInputField
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Mật khẩu"
+                required
+                icon="lock"
+              />
+              <a href="#" className="auth-forgot-link">Quên mật khẩu?</a>
+              {error && <div className="auth-error">{error}</div>}
+              <button type="submit" className="auth-submit-button">Đăng nhập</button>
+            </form>
 
-        <p className="auth-signup-prompt">
-          Chưa có tài khoản?
-          <a href="#" className="auth-signup-link">Đăng ký</a>
-        </p>
-      </div>
+            <p className="auth-signup-prompt">
+              Chưa có tài khoản?
+              <a href="#" className="auth-signup-link" onClick={() => setIsLogin(false)}>Đăng ký</a>
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="register"
+            className="auth-modal-content"
+            variants={slideVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            custom="left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <RegisterForm
+              onRegisterSuccess={onLoginSuccess}
+              onClose={onClose}
+              switchToLogin={() => setIsLogin(true)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
