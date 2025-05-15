@@ -1,79 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
 
 interface ExampleSentenceProps {
   word: string;
 }
 
 const ExampleSentence: React.FC<ExampleSentenceProps> = ({ word }) => {
+  const [examples, setExamples] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [japanese, setJapanese] = useState<string>('');
-  const [english, setEnglish] = useState<string>('');
-
-  // Simulate API call to generate example sentence
-  const generateExampleSentence = async () => {
-    if (!word) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // In a real implementation, this would call the OpenAI API
-      // For demo purposes, we'll simulate a response
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate response based on the word
-      if (word === '会社' || word === 'かいしゃ') {
-        setJapanese('私は大きな会社で働いています。');
-        setEnglish('I work at a big company.');
-      } else {
-        setJapanese(`${word}についての例文です。`);
-        setEnglish(`This is an example sentence about ${word}.`);
-      }
-    } catch (err) {
-      setError('Failed to generate example sentence');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    if (word) {
-      generateExampleSentence();
-    }
+    const fetchExamples = async () => {
+      if (!word) return;
+      
+      setLoading(true);
+      try {
+        // This is a fallback API if you don't have example sentences in your local API
+        const response = await fetch(`https://jisho.org/api/v1/search/example?query=${encodeURIComponent(word)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.results) {
+            setExamples(data.results.slice(0, 3)); // Get first 3 examples
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching example sentences:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExamples();
   }, [word]);
 
-  return (
-    <div className="border rounded-lg bg-slate-50 p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-slate-800">Example Sentence</h3>
-        <button
-          onClick={generateExampleSentence}
-          disabled={loading}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium ${
-            loading
-              ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-              : 'bg-indigo-600 text-white hover:bg-indigo-700'
-          }`}
-        >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          {loading ? 'Generating...' : 'Regenerate'}
-        </button>
+  if (loading) {
+    return (
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-3 text-slate-800">Example Sentences</h3>
+        <div className="animate-pulse">
+          <div className="h-6 bg-slate-200 rounded mb-2"></div>
+          <div className="h-4 bg-slate-200 rounded w-3/4 mb-4"></div>
+          <div className="h-6 bg-slate-200 rounded mb-2"></div>
+          <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+        </div>
       </div>
-      
-      {error ? (
-        <p className="text-red-500">{error}</p>
-      ) : loading ? (
-        <div className="py-4 text-center text-slate-500">
-          <p>Generating example...</p>
-        </div>
-      ) : (
-        <div>
-          <p className="mb-2 text-lg font-medium text-slate-800">{japanese}</p>
-          <p className="text-slate-600">{english}</p>
-        </div>
-      )}
+    );
+  }
+
+  if (examples.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6">
+      <h3 className="text-lg font-semibold mb-3 text-slate-800">Example Sentences</h3>
+      <div className="space-y-4">
+        {examples.map((example, index) => (
+          <div key={index} className="p-4 bg-slate-50 rounded-lg">
+            <p className="text-lg mb-1">{example.japanese}</p>
+            <p className="text-slate-600">{example.english}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

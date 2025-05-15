@@ -1,6 +1,27 @@
 import React from 'react';
-import { WordData } from '../types';
 import { Loader2 } from 'lucide-react';
+
+type Sense = {
+  english_definitions: string[];
+  parts_of_speech: string[];
+};
+
+type JapaneseWord = {
+  word?: string;
+  reading: string;
+};
+
+type WordData = {
+  id?: string;
+  word: string;
+  reading: string;
+  partOfSpeech?: string;
+  meaning?: string;
+  is_common: boolean;
+  jlpt: string[];
+  senses: Sense[];
+  japanese: JapaneseWord[];
+};
 
 interface WordListProps {
   searchResults: WordData[];
@@ -9,12 +30,12 @@ interface WordListProps {
   loading?: boolean;
 }
 
-const WordList: React.FC<WordListProps> = ({ 
+function WordList({ 
   searchResults, 
   selectedWord, 
   onWordSelect,
   loading
-}) => {
+}: WordListProps) {
   if (loading) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
@@ -39,12 +60,12 @@ const WordList: React.FC<WordListProps> = ({
       </div>
       <ul className="divide-y divide-slate-200">
         {searchResults.map((word) => {
-          const mainJapanese = word.japanese[0];
+          const mainJapanese = word.japanese?.[0];
           const isSelected = selectedWord?.id === word.id;
-          
+
           return (
             <li 
-              key={word.id} 
+              key={word.id || `${word.word}-${word.reading}`} 
               className={`cursor-pointer transition-colors duration-200 ${
                 isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-slate-50'
               }`}
@@ -54,12 +75,12 @@ const WordList: React.FC<WordListProps> = ({
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-xl font-semibold mb-1">
-                      {mainJapanese.word} 
-                      <span className="text-orange-500 ml-2">{mainJapanese.reading}</span>
+                      {mainJapanese?.word || word.word}
+                      <span className="text-orange-500 ml-2">{mainJapanese?.reading || word.reading}</span>
                     </p>
                     <p className="text-slate-600">
-                      {word.senses[0].english_definitions.slice(0, 2).join(', ')}
-                      {word.senses[0].english_definitions.length > 2 && '...'}
+                      {word.senses?.[0]?.english_definitions?.slice(0, 2).join(', ') || 'No definition'}
+                      {word.senses?.[0]?.english_definitions?.length > 2 && '...'}
                     </p>
                   </div>
                   {word.is_common && (
@@ -68,7 +89,7 @@ const WordList: React.FC<WordListProps> = ({
                     </span>
                   )}
                 </div>
-                {word.jlpt && word.jlpt.length > 0 && (
+                {word.jlpt?.length > 0 && (
                   <div className="mt-2">
                     <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
                       {word.jlpt[0].toUpperCase()}
@@ -82,6 +103,6 @@ const WordList: React.FC<WordListProps> = ({
       </ul>
     </div>
   );
-};
+}
 
 export default WordList;

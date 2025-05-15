@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2, LogIn, LogOut, Shield } from 'lucide-react';
 import { isAuthenticated, logout } from '../../auth';
 import "./Header.css";
-import LoginForm from '../LoginFormComponents/LoginForm';
 import { navLinks } from '../data/navLinks';
 import NavLinks from '../NavLinks';
 

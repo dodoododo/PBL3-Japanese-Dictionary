@@ -10,8 +10,7 @@ import FlashcardPage from './components/FlashCardComponents/FlashcardPage';
 import JLPTPage from './components/JLPTComponents/JLPTPage';
 import KanjiList from './components/JLPTComponents/KanjiList';
 import AdminPage from './components/AdminComponents/Admin';
-import SearchResult from "./components/SearchResultsComponents/SearchResult";
-import SearchResultNew from "./components/SearchResultsComponents/SearchResult";
+import SearchResultNew from "./components/SearchResultsComponents/SearchResultNew";
 
 import DnDGame from './components/views/DnDGame.jsx';
 import * as wanakana from 'wanakana';
@@ -127,7 +126,7 @@ function App() {
   
     try {
       // 1. Gọi backend
-      const response = await fetch(`http://localhost:8082/api/words/${searchTerm}`);
+      const response = await fetch(`http://localhost:8082/api/words/?q=${searchTerm}`);
   
       if (!response.ok) {
         throw new Error('Không tìm thấy trong DB');
@@ -146,21 +145,29 @@ function App() {
         if (!response.ok) throw new Error('Lỗi từ Jisho');
   
         const data = await response.json();
-        if (!data.data || data.data.length === 0) throw new Error('Không có kết quả');
+        if (!data.data || data.data.length === 0) throw new Error('JSON Returns nun');
   
         const wordData = data.data[0];
   
-        const formattedResult = {
-          word: wordData.japanese[0]?.word || '',
-          reading: wordData.japanese[0]?.reading || '',
-          partOfSpeech: wordData.senses[0]?.parts_of_speech?.[0] || '',
-          meaning: wordData.senses[0]?.english_definitions?.join(', '),
-          is_common: wordData.is_common,
-          jlpt: wordData.jlpt,
-          senses: wordData.senses
-        };
-  
-        setSearchResult(formattedResult);
+        // const formattedResult = {
+        //   word: wordData.japanese[0]?.word || '',
+        //   reading: wordData.japanese[0]?.reading || '',
+        //   partOfSpeech: wordData.senses[0]?.parts_of_speech?.[0] || '',
+        //   meaning: wordData.senses[0]?.english_definitions?.join(', '),
+        //   is_common: wordData.is_common,
+        //   jlpt: wordData.jlpt,
+        //   senses: wordData.senses
+        // };
+        const formattedResult = data.data.map((wordData) => ({
+          word: wordData.japanese?.[0]?.word || '',
+          reading: wordData.japanese?.[0]?.reading || '',
+          partOfSpeech: wordData.senses?.[0]?.parts_of_speech?.[0] || '',
+          meaning: wordData.senses?.[0]?.english_definitions?.join(', ') || '',
+          is_common: wordData.is_common || false,
+          jlpt: wordData.jlpt?.join(', ') || '',
+          senses: wordData.senses || [],
+        }));
+        setSearchResult(formattedResult); 
       } catch (error) {
         setNoResults(true);
         console.error('Lỗi từ Jisho:', error);
@@ -170,8 +177,6 @@ function App() {
     }
   };
   
-  
-
   const handleLevelSelect = (level) => {
     setSelectedLevel(level);
     setLevelDropdownOpen(false);
@@ -235,7 +240,7 @@ function App() {
         }} />
         
         <div className="main-container flex-grow">
-          <main className="main">   
+          <main className="main w-full">   
             <div className="container">
               <Routes>
                 <Route path="/" element={
@@ -279,9 +284,7 @@ function App() {
 
               
               {isLoading ? (
-                  <div className="loading">
-                    <p>{translations.searching}</p>
-                  </div>
+                  <div class="loader"></div>
                 ) : noResults ? (
                   <div className="no-results">
                     <p>😕</p>
@@ -289,7 +292,7 @@ function App() {
                     <p>{translations.noResultsDesc}</p>
                   </div>
                 ) : searchResult && (
-                  <SearchResult
+                  <SearchResultNew
                     searchResult={searchResult} 
                     playPronunciation={playPronunciation} 
                     translations={translations} 
@@ -301,8 +304,8 @@ function App() {
 
         <footer className="footer">
           <div className="footer-container">
-            <p>© 2025 JapanEasy - {language === 'english' ? 'Japanese Dictionary' : 'Từ điển tiếng Nhật'}</p>
-            <p>{translations.attributionText.substring(0, 150)}...</p>
+            <p>© 2025 JapanEasy - Japanese Dictionary</p>
+            <p></p>
           </div>
         </footer>
 
