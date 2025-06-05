@@ -3,9 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2, LogIn, LogOut, Shield } from 'lucide-react';
 import { isAuthenticated, logout } from '../../auth';
 import "./Header.css";
-import LoginForm from '../LoginFormComponents/LoginForm';
 import { navLinks } from '../data/navLinks';
-import NavLinks from '../NavLinks';
+import NavLinks from '../KanaComponents/NavLinks';
 
 const Header = ({ 
   searchTerm, 
@@ -52,6 +51,11 @@ const Header = ({
   const handleAdminClick = () => {
     setUserDropdownOpen(false);
     navigate('/admin');
+  };
+
+  const handleEditProfileClick = () => {
+    setUserDropdownOpen(false);
+    navigate('/edit-profile');
   };
 
   // Reset selectedLevel khi URL thay đổi, trừ khi đang ở trang kanji
@@ -169,7 +173,7 @@ const Header = ({
                         <div className="user-id">ID: 1852702</div>
                       </div>
                     </div>
-                    <button className="edit-profile-button">
+                    <button className="edit-profile-button" onClick={handleEditProfileClick}>
                       ✏️ Edit Profile
                     </button>
                     {isAdmin && (

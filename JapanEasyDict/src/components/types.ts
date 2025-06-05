@@ -1,27 +1,18 @@
-export interface JapaneseWord {
+export interface Japanese {
   word?: string;
   reading: string;
 }
 
-export interface WordSense {
+export interface Sense {
   english_definitions: string[];
   parts_of_speech: string[];
 }
 
 export interface WordData {
-  id: string;
-  japanese: JapaneseWord[];
-  senses: WordSense[];
-  is_common: boolean;
-  jlpt: string[];
-}
-
-export interface APIWordResponse {
-  id: string;
-  word: string;
-  reading: string;
-  meaning: string;
-  partOfSpeech: string;
-  is_common: boolean;
+  id?: string;
+  slug?: string;
+  japanese: Japanese[];
+  senses: Sense[];
+  is_common?: boolean;
   jlpt?: string[];
 }

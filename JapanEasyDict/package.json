@@ -12,6 +12,8 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",
     "framer-motion": "^12.10.5",
+    "html2pdf.js": "^0.10.3",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.484.0",
     "openai": "^4.97.0",
     "react": "^19.0.0",

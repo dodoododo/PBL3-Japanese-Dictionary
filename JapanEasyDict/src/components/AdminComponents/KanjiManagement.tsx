@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import { JLPT_DATA } from '../../data';
+import './Admin.css';
 
 interface KanjiItem {
   kanji: string;
@@ -90,25 +91,25 @@ const KanjiManagement: React.FC<Props> = ({ level, onShowToast }) => {
   );
 
   return (
-    <div className="bg-gray-800/50 rounded-xl p-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <h2 className="text-xl font-semibold">Kanji Management - {level}</h2>
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
-          <div className="relative">
+    <div className="admin-kanji-container">
+      <div className="admin-kanji-header">
+        <h2 className="admin-kanji-title">Kanji Management - {level}</h2>
+        <div className="admin-kanji-controls">
+          <div className="admin-search-container">
             <input
               type="text"
-              placeholder="Search kanji, reading, meaning..."
-              className="bg-gray-900 text-white rounded-lg pl-10 pr-4 py-2 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Search kanji, words"
+              className="admin-search-input"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
+            <Search className="admin-search-icon" />
           </div>
           <button 
-            className="bg-blue-600 hover:bg-blue-700 transition-colors px-4 py-2 rounded-lg flex items-center justify-center space-x-2"
+            className="admin-add-button"
             onClick={() => setShowAddForm(!showAddForm)}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="admin-add-icon" />
             <span>{showAddForm ? 'Cancel' : 'Add Kanji'}</span>
           </button>
         </div>
@@ -116,43 +117,43 @@ const KanjiManagement: React.FC<Props> = ({ level, onShowToast }) => {
 
       {/* Add Kanji Form */}
       {showAddForm && (
-        <div className="bg-gray-900/60 p-4 rounded-lg mb-6 animate-fadeIn">
-          <h3 className="text-lg font-medium mb-3">Add New Kanji</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Kanji</label>
+        <div className="admin-add-form admin-animate-fadeIn">
+          <h3 className="admin-add-form-title">Add New Kanji</h3>
+          <div className="admin-form-grid">
+            <div className="admin-form-field">
+              <label className="admin-form-label">Kanji</label>
               <input
                 type="text"
-                className="w-full bg-gray-800 border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="admin-form-input"
                 value={newKanji.kanji}
                 onChange={(e) => setNewKanji({ ...newKanji, kanji: e.target.value })}
               />
             </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Reading</label>
+            <div className="admin-form-field">
+              <label className="admin-form-label">Reading</label>
               <input
                 type="text"
-                className="w-full bg-gray-800 border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="admin-form-input"
                 value={newKanji.reading}
                 onChange={(e) => setNewKanji({ ...newKanji, reading: e.target.value })}
               />
             </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Meaning</label>
+            <div className="admin-form-field">
+              <label className="admin-form-label">Meaning</label>
               <input
                 type="text"
-                className="w-full bg-gray-800 border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="admin-form-input"
                 value={newKanji.meaning}
                 onChange={(e) => setNewKanji({ ...newKanji, meaning: e.target.value })}
               />
             </div>
           </div>
-          <div className="mt-4 flex justify-end">
+          <div className="admin-form-actions">
             <button
-              className="bg-green-600 hover:bg-green-700 transition-colors px-4 py-2 rounded-lg flex items-center space-x-2"
+              className="admin-save-button"
               onClick={handleAddKanji}
             >
-              <Save className="w-4 h-4" />
+              <Save className="admin-save-icon" />
               <span>Save Kanji</span>
             </button>
           </div>
@@ -160,20 +161,20 @@ const KanjiManagement: React.FC<Props> = ({ level, onShowToast }) => {
       )}
 
       {/* Kanji List */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+      <div className="admin-kanji-table-container">
+        <table className="admin-kanji-table">
           <thead>
-            <tr className="bg-gray-900/70 text-left">
-              <th className="p-3 rounded-tl-lg">Kanji</th>
-              <th className="p-3">Reading</th>
-              <th className="p-3">Meaning</th>
-              <th className="p-3 rounded-tr-lg text-right">Actions</th>
+            <tr className="admin-table-header">
+              <th className="admin-table-header-cell">Kanji</th>
+              <th className="admin-table-header-cell">Reading</th>
+              <th className="admin-table-header-cell">Meaning</th>
+              <th className="admin-table-header-cell">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredKanji.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-4 text-center text-gray-400">
+                <td colSpan={4} className="admin-empty-message">
                   {searchTerm ? 'No kanji found matching your search' : 'No kanji in this level yet'}
                 </td>
               </tr>
@@ -181,68 +182,68 @@ const KanjiManagement: React.FC<Props> = ({ level, onShowToast }) => {
               filteredKanji.map((item, index) => (
                 <tr 
                   key={index} 
-                  className="border-b border-gray-800 hover:bg-gray-900/30 transition-colors"
+                  className="admin-table-row"
                 >
                   {editingIndex === index ? (
                     <>
-                      <td className="p-3">
+                      <td className="admin-table-cell">
                         <input
                           type="text"
-                          className="w-full bg-gray-800 border border-gray-700 rounded p-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="admin-edit-input"
                           value={editItem.kanji}
                           onChange={(e) => setEditItem({ ...editItem, kanji: e.target.value })}
                         />
                       </td>
-                      <td className="p-3">
+                      <td className="admin-table-cell">
                         <input
                           type="text"
-                          className="w-full bg-gray-800 border border-gray-700 rounded p-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="admin-edit-input"
                           value={editItem.reading}
                           onChange={(e) => setEditItem({ ...editItem, reading: e.target.value })}
                         />
                       </td>
-                      <td className="p-3">
+                      <td className="admin-table-cell">
                         <input
                           type="text"
-                          className="w-full bg-gray-800 border border-gray-700 rounded p-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="admin-edit-input"
                           value={editItem.meaning}
                           onChange={(e) => setEditItem({ ...editItem, meaning: e.target.value })}
                         />
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="admin-table-actions">
                         <button
-                          className="p-2 bg-green-600 hover:bg-green-700 text-white rounded mr-2 transition-colors"
+                          className="admin-action-button save"
                           onClick={saveEdit}
                         >
-                          <Save className="w-4 h-4" />
+                          <Save className="admin-action-icon" />
                         </button>
                         <button
-                          className="p-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
+                          className="admin-action-button cancel"
                           onClick={cancelEdit}
                         >
-                          <X className="w-4 h-4" />
+                          <X className="admin-action-icon" />
                         </button>
                       </td>
                     </>
                   ) : (
                     <>
-                      <td className="p-3">
-                        <span className="text-2xl font-bold">{item.kanji}</span>
+                      <td className="admin-table-cell">
+                        <span className="admin-kanji-display">{item.kanji}</span>
                       </td>
-                      <td className="p-3">{item.reading}</td>
-                      <td className="p-3">{item.meaning}</td>
-                      <td className="p-3 text-right">
+                      <td className="admin-table-cell">{item.reading}</td>
+                      <td className="admin-table-cell">{item.meaning}</td>
+                      <td className="admin-table-actions">
                         <button
-                          className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded mr-2 transition-colors"
+                          className="admin-action-button edit"
                           onClick={() => startEditing(index)}
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="admin-action-icon" />
                         </button>
                         <button
-                          className="p-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                          className="admin-action-button delete"
                           onClick={() => handleDeleteKanji(index)}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="admin-action-icon" />
                         </button>
                       </td>
                     </>

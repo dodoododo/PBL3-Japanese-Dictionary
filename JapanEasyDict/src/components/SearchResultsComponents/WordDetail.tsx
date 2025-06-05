@@ -1,7 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Volume2, Bookmark, BookmarkCheck, RefreshCw } from 'lucide-react';
-import { WordData } from '../types';
+import React from 'react';
+import { Volume2, Bookmark, BookmarkCheck } from 'lucide-react';
 import ExampleSentence from './ExampleSentence';
+import './SearchResult.css';
+
+
+type Sense = {
+  english_definitions: string[];
+  parts_of_speech: string[];
+};
+
+type JapaneseWord = {
+  word?: string;
+  reading: string;
+};
+
+type WordData = {
+  id?: string;
+  word: string;
+  reading: string;
+  partOfSpeech?: number;
+  meaning?: string[];
+  is_common: boolean;
+  jlpt: string[];
+  senses: Sense[];
+  japanese: JapaneseWord[];
+};
 
 interface WordDetailProps {
   word: WordData;
@@ -10,20 +33,27 @@ interface WordDetailProps {
   isSaved: boolean;
 }
 
-const WordDetail: React.FC<WordDetailProps> = ({ 
+function WordDetail({ 
   word, 
   playPronunciation, 
   onSaveWord,
   isSaved
-}) => {
-  const mainJapanese = word.japanese[0];
+}: WordDetailProps) {
+  const mainJapanese = word.japanese?.[0] || { word: word.word, reading: word.reading };
+  if (!mainJapanese.reading) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded shadow">
+        Error: Missing Japanese word data.
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-6 bg-slate-800 text-white">
-        <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-bold">
-            {mainJapanese.word}
+        <div className="flex items-center">
+          <h2 className="word-detail-main-word text-3xl font-bold">
+            {word.word}
           </h2>
           <button 
             onClick={() => onSaveWord(word)}
@@ -35,13 +65,13 @@ const WordDetail: React.FC<WordDetailProps> = ({
         </div>
       </div>
       
-      <div className="p-6">
+      <div className="word-detail-details">
         {/* Reading */}
         <div className="mb-6 bg-slate-50 p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm text-slate-500 uppercase mb-1">Reading</h3>
-              <p className="text-2xl text-slate-800 font-medium">{mainJapanese.reading}</p>
+          <div className="flex items-center">
+            <div className="word-detail-reading">
+              <h3 className="text-lg text-slate-500 uppercase mb-1">Reading</h3>
+              <p className="text-3xl text-slate-800 font-medium">{word.reading}</p>
             </div>
             <button 
               onClick={() => playPronunciation(mainJapanese.reading)}
@@ -60,43 +90,26 @@ const WordDetail: React.FC<WordDetailProps> = ({
               Common Word
             </span>
           )}
-          {word.jlpt && word.jlpt.map((level, index) => (
-            <span key={index} className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
-              {level.toUpperCase()}
-            </span>
-          ))}
         </div>
         
         {/* Meanings */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3 text-slate-800">Meanings</h3>
+        <div className="mb-6 min-h-full">
+          <h3 className="text-lg text-slate-500 uppercase">MEANING</h3>
           <div className="space-y-4">
-            {word.senses.map((sense, index) => (
-              <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
-                {sense.parts_of_speech && sense.parts_of_speech.length > 0 && (
-                  <div className="mb-2">
-                    {sense.parts_of_speech.map((pos, posIndex) => (
-                      <span key={posIndex} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
-                        {pos}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <ul className="list-disc list-inside text-slate-700">
-                  {sense.english_definitions.map((def, defIndex) => (
-                    <li key={defIndex}>{def}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <p className="text-3xl text-slate-800 font-medium">
+              {Array.isArray(word.meaning)
+                ? word.meaning.slice(0, 2).join(', ')
+                : word.meaning || 'No definition'}
+              {Array.isArray(word.meaning) && word.meaning.length > 2 && '...'}
+            </p>
           </div>
         </div>
         
         {/* Example Sentence */}
-        <ExampleSentence word={mainJapanese.word || mainJapanese.reading} />
+        <ExampleSentence word={word} />
       </div>
     </div>
   );
-};
+}
 
 export default WordDetail;

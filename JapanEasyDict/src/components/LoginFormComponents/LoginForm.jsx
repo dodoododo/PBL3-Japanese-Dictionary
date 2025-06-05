@@ -65,9 +65,9 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
               <X size={24} />
             </button>
 
-            <h2 className="auth-form-title">Đăng nhập với</h2>
+            <h2 className="auth-form-title">Login</h2>
 
-            <div className="auth-social-login">
+            {/* <div className="auth-social-login">
               <button className="auth-social-button">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="auth-social-icon" />
                 Google
@@ -76,7 +76,7 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
 
             <div className="auth-separator">
               <span>hoặc</span>
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit} className="auth-form">
               <LoginInputField
@@ -97,14 +97,14 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
                 required
                 icon="lock"
               />
-              <a href="#" className="auth-forgot-link">Quên mật khẩu?</a>
+              <a href="#" className="auth-forgot-link">Forgot Password?</a>
               {error && <div className="auth-error">{error}</div>}
-              <button type="submit" className="auth-submit-button">Đăng nhập</button>
+              <button type="submit" className="auth-submit-button">Login</button>
             </form>
 
             <p className="auth-signup-prompt">
-              Chưa có tài khoản?
-              <a href="#" className="auth-signup-link" onClick={() => setIsLogin(false)}>Đăng ký</a>
+              Don't have an account ? 
+              <a href="#" className="auth-signup-link" onClick={() => setIsLogin(false)}>Sign-up</a>
             </p>
           </motion.div>
         ) : (

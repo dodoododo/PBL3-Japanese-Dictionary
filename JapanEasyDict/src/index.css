@@ -39,6 +39,7 @@ body {
 }
 
 .welcome-page {
+  min-height: 100vh;
   margin: auto;
   padding: 0 4rem;
 }
@@ -202,33 +203,17 @@ body {
   color: #666;
 }
 
-.footer {
-  background: var(--background-light);
-  padding: 2rem 0;
-  margin-left: 200px;
-  transition: margin-left 0.4s ease;
-}
-
 .main-container.sidebar-collapsed ~ .footer {
-  margin-left: 83px;
+  margin-left: 5.5%;
 }
 
-.footer p {
-  text-align: center;
-  color: #666;
-  font-size: 0.875rem;
-  margin: 0.5rem 0;
-}
 
 @media (max-width: 768px) {
   .main-container {
-    margin-left: 0;
+    margin-left: 12.5%;
     transition: margin-left 0.4s ease;
   }
 
-  .main-container.sidebar-visible {
-    margin-left: 270px;
-  }
 
   .footer {
     margin-left: 0;
@@ -236,14 +221,6 @@ body {
 
   .main-container.sidebar-visible ~ .footer {
     margin-left: 270px;
-  }
-
-  .main {
-    padding: 1rem;
-  }
-  
-  .container {
-    padding: 0 1rem;
   }
 
   .logo {
@@ -330,15 +307,38 @@ body {
 
 .app {
   min-height: 100vh;
-  background: linear-gradient(#F1F3FF, #CBD4FF);
 }
 
 .main-container {
   padding-top: 64px;
-  margin-left: 200px;
+  margin-left: 12%;
   transition: margin-left 0.4s ease;
+  flex-grow: 1;
 }
 
 .main-container.sidebar-collapsed {
-  margin-left: 83px;
+  margin-left: 5.5%;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: fit-content;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 30px;
+  background: linear-gradient(135deg,#0000 calc(50% - 0.5em),#000 0 calc(50% + 0.5em),#0000 0) right/300% 100%;
+  animation: l22 2s infinite;
+}
+.loader::before {
+  content: "Loading...";
+  color: #0000;
+  padding: 0 5px;
+  background: inherit;
+  background-image: linear-gradient(135deg,#000 calc(50% - 0.5em),#fff 0 calc(50% + 0.5em),#000 0);
+  -webkit-background-clip:text;
+          background-clip:text;
+}
+
+@keyframes l22{
+  100%{background-position: left}
 }

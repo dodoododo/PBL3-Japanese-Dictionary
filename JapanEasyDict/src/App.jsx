@@ -10,14 +10,13 @@ import FlashcardPage from './components/FlashCardComponents/FlashcardPage';
 import JLPTPage from './components/JLPTComponents/JLPTPage';
 import KanjiList from './components/JLPTComponents/KanjiList';
 import AdminPage from './components/AdminComponents/Admin';
-import SearchResult from "./components/SearchResultsComponents/SearchResult";
-import SearchResultNew from "./components/SearchResultsComponents/SearchResult";
-
+import SearchResultNew from "./components/SearchResultsComponents/SearchResultNew";
+import Footer from './components/FooterComponents/Footer.jsx';
 import DnDGame from './components/views/DnDGame.jsx';
 import * as wanakana from 'wanakana';
-
+import EditProfile from './components/HeaderComponents/EditProfile.jsx';
 import './auth.js'
-import Kana from './components/views/Kana.jsx';
+import Kana from './components/KanaComponents/Kana.jsx';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -127,7 +126,7 @@ function App() {
   
     try {
       // 1. Gọi backend
-      const response = await fetch(`http://localhost:8082/api/words/${searchTerm}`);
+      const response = await fetch(`http://localhost:8082/api/words/?q=${searchTerm}`);
   
       if (!response.ok) {
         throw new Error('Không tìm thấy trong DB');
@@ -139,39 +138,14 @@ function App() {
       } else {
         setNoResults(true);
       }
-    } catch {
-      // 2. Nếu fail → fallback sang Jisho API
-      try {
-        const response = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(searchTerm)}`);
-        if (!response.ok) throw new Error('Lỗi từ Jisho');
-  
-        const data = await response.json();
-        if (!data.data || data.data.length === 0) throw new Error('Không có kết quả');
-  
-        const wordData = data.data[0];
-  
-        const formattedResult = {
-          word: wordData.japanese[0]?.word || '',
-          reading: wordData.japanese[0]?.reading || '',
-          partOfSpeech: wordData.senses[0]?.parts_of_speech?.[0] || '',
-          meaning: wordData.senses[0]?.english_definitions?.join(', '),
-          is_common: wordData.is_common,
-          jlpt: wordData.jlpt,
-          senses: wordData.senses
-        };
-  
-        setSearchResult(formattedResult);
-      } catch (error) {
+    } catch (error) {
         setNoResults(true);
-        console.error('Lỗi từ Jisho:', error);
-      }
-    } finally {
+        console.error('Handle Search error: ', error);
+      } finally {
       setIsLoading(false);
     }
   };
   
-  
-
   const handleLevelSelect = (level) => {
     setSelectedLevel(level);
     setLevelDropdownOpen(false);
@@ -200,7 +174,7 @@ function App() {
 
   return (
     <Router>
-      <div className="app flex flex-col min-h-screen">
+      <div className="app flex flex-col">
         <Header 
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -234,7 +208,7 @@ function App() {
           }
         }} />
         
-        <div className="main-container flex-grow">
+        <div className="main-container">
           <main className="main">   
             <div className="container">
               <Routes>
@@ -266,46 +240,41 @@ function App() {
                     </div>
                   )
                 } />
+                
                 <Route path="/jlpt" element={<JLPTPage />} />
                 <Route path="/kanji/:level" element={<KanjiList />} />
                 <Route path="/flashcards/:level" element={<FlashcardPage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/edit-profile" element={<EditProfile />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/hiragana" element={<Kana title="Hiragana" symbol="あ" />} />
                 <Route path="/katakana" element={<Kana title="Katakana" symbol="ア" />} />
                 <Route path="/game" element={<DnDGame />} />
               </Routes>
 
-
-              
               {isLoading ? (
-                  <div className="loading">
-                    <p>{translations.searching}</p>
-                  </div>
-                ) : noResults ? (
-                  <div className="no-results">
-                    <p>😕</p>
-                    <h2>{translations.noResults}</h2>
-                    <p>{translations.noResultsDesc}</p>
-                  </div>
-                ) : searchResult && (
-                  <SearchResult
-                    searchResult={searchResult} 
-                    playPronunciation={playPronunciation} 
-                    translations={translations} 
-                  />
-                )}
+                <div className="loader"></div>
+              ) : noResults ? (
+                <div className="no-results">
+                  <p>😕</p>
+                  <h2>{translations.noResults}</h2>
+                  <p>{translations.noResultsDesc}</p>
+                </div>
+              ) : searchResult && (
+                <SearchResultNew
+                  searchResult={searchResult} 
+                  playPronunciation={playPronunciation} 
+                  translations={translations} 
+                />
+              )} 
+              
+              
             </div>
           </main>
         </div>
 
-        <footer className="footer">
-          <div className="footer-container">
-            <p>© 2025 JapanEasy - {language === 'english' ? 'Japanese Dictionary' : 'Từ điển tiếng Nhật'}</p>
-            <p>{translations.attributionText.substring(0, 150)}...</p>
-          </div>
-        </footer>
-
+        <Footer />
+        
         {showLoginForm && (
           <LoginForm 
             onLoginSuccess={handleLoginSuccess} 

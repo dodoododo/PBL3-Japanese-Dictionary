@@ -39,7 +39,7 @@ const RegisterForm = ({ onRegisterSuccess, onClose, switchToLogin }) => {
         <button className="auth-close-button" onClick={onClose}>
         <X size={24} />
         </button>
-        <h2 className="auth-form-title">Tạo tài khoản</h2>
+        <h2 className="auth-form-title">Create Account</h2>
         <form onSubmit={handleSubmit} className="auth-form">
             <LoginInputField
             type="email"
@@ -55,7 +55,7 @@ const RegisterForm = ({ onRegisterSuccess, onClose, switchToLogin }) => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="Mật khẩu"
+            placeholder="Password"
             required
             icon="lock"
             />
@@ -64,7 +64,7 @@ const RegisterForm = ({ onRegisterSuccess, onClose, switchToLogin }) => {
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
-            placeholder="Xác nhận mật khẩu"
+            placeholder="Confirm Password"
             required
             icon="lock"
             />
@@ -72,12 +72,12 @@ const RegisterForm = ({ onRegisterSuccess, onClose, switchToLogin }) => {
             {error && <div className="auth-error">{error}</div>}
 
             <button type="submit" className="auth-submit-button">
-            Đăng ký
+            Sign-up
             </button>
         </form>
         <p className="auth-signup-prompt">
-        Đã có tài khoản?
-        <a href="#" className="auth-signup-link" onClick={switchToLogin}>Đăng nhập</a>
+        Already have an account ?
+        <a href="#" className="auth-signup-link" onClick={switchToLogin}>Login</a>
         </p>
     </>
     );

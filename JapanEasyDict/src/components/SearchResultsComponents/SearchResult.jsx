@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2 } from 'lucide-react';
-import { OpenAI } from 'openai';
 import './SearchResult.css';
 
-const openai = new OpenAI({
-  apiKey: "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", // Thay bằng API key thật của bạn
-  dangerouslyAllowBrowser: true,
-});
+
 
 const SearchResult = ({ searchResult, playPronunciation, translations }) => {
   if (!searchResult) return null;

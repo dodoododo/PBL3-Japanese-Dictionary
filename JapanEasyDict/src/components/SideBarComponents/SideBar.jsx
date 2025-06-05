@@ -81,12 +81,12 @@ const Sidebar = ({ onToggle }) => {
               </Link>
             </li>
 
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link to="/flashcards" className="nav-link">
                 <NotepadText className="nav-icon" />
                 <span className="nav-label">Flashcards</span>
               </Link>
-            </li>
+            </li> */}
 
             <li className="nav-item">
               <Link to="/game" className="nav-link">
@@ -96,7 +96,7 @@ const Sidebar = ({ onToggle }) => {
             </li>
           </ul>
 
-          <ul className="nav-list secondary-nav">
+          {/* <ul className="nav-list secondary-nav">
             <li className="nav-item">
               <a href="#" className="nav-link">
                 <HelpCircle className="nav-icon" />
@@ -109,7 +109,7 @@ const Sidebar = ({ onToggle }) => {
                 <span className="nav-label">Sign Out</span>
               </a>
             </li>
-          </ul>
+          </ul> */}
         </nav>
       </aside>
     </>

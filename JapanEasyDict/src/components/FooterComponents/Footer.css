@@ -1,0 +1,96 @@
+.footer {
+  background: linear-gradient(to right, #0f172a, #1e293b, #0f172a);
+  color: #fff;
+  font-family: sans-serif;
+  margin-left: 12%;
+  transition: margin-left 0.4s ease;
+}
+
+.footer-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 30px 24px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 32px;
+}
+@media (min-width: 768px) {
+  .footer-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .footer-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.brand-section .brand-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  color: #60a5fa;
+}
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  background: linear-gradient(to right, #60a5fa, #a855f7);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-left: 8px;
+}
+.brand-text {
+  color: #d1d5db;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.heart-icon { width: 16px; height: 16px; color: #ef4444; vertical-align: middle; margin: 0 4px; }
+.code-icon { width: 16px; height: 16px; color: #10b981; vertical-align: middle; margin: 0 4px; }
+.creator-info { font-size: 0.875rem; color: #9ca3af; }
+.creator-name { font-weight: 600; color: #fff; }
+.links-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 10px; color: #7dd3fc; padding-left: 1rem;}
+.project-title { color: #6ee7b7; }
+.connect-title { color: #d8b4fe; }
+.links-list { list-style: none; padding: 0; margin: 0; }
+.link-item {
+  display: flex;
+  align-items: center;
+  color: #d1d5db;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.link-item:hover { color: currentColor; }
+.link-icon { width: 12px; height: 12px; margin-right: 8px; opacity: 0; transition: opacity 0.2s; }
+.link-item:hover .link-icon { opacity: 1; }
+.external-icon { width: 12px; height: 12px; margin-left: 4px; opacity: 0.5; }
+.social-list { display: flex; flex-wrap: wrap; gap: 12px; }
+.social-item {
+  padding: 12px;
+  background-color: #374151;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  transition: transform 0.3s, background-color 0.3s;
+}
+.social-item:hover { background-color: #4b5563; transform: scale(1.1); }
+.social-github:hover { color: #000; }
+.social-facebook:hover { color: #38bdf8; }
+.social-linkedin:hover { color: #2563eb; }
+.social-mail:hover { color: #ef4444; }
+.footer-bottom {
+  border-top: 1px solid #334155;
+}
+.bottom-content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .bottom-content { flex-direction: row; justify-content: space-between; }
+}
+.copyright { font-size: 0.875rem; color: #9ca3af; margin-bottom: 8px; }
+.built-info { font-size: 0.75rem; color: #6b7280; display: flex; gap: 8px; }
