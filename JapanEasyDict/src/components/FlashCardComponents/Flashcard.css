@@ -5,7 +5,9 @@
 } */
 
 .flashcard-container {
+  height: 75vh;
   margin: 2rem auto;
+  margin-bottom: 5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,7 +15,11 @@
   width: 650px;
   background-color: rgb(233, 177, 205);
   border-radius: 20px;
-  padding: 2rem;
+  padding: 0 2rem;
+}
+
+.flashcard-title {
+  margin-bottom: 1rem;
 }
 
 .button-container {

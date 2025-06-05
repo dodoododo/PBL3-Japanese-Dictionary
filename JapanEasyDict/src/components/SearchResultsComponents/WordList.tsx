@@ -1,5 +1,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
+import './SearchResult.css';
+
 
 type Sense = {
   english_definitions: string[];
@@ -15,8 +17,8 @@ type WordData = {
   id?: string;
   word: string;
   reading: string;
-  partOfSpeech?: string;
-  meaning?: string;
+  partOfSpeech?: number;
+  meaning?: string[];
   is_common: boolean;
   jlpt: string[];
   senses: Sense[];
@@ -54,53 +56,65 @@ function WordList({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4 bg-slate-800 text-white">
-        <h2 className="text-lg font-semibold">Search Results</h2>
+    <div className="word-list-overflow-container bg-white rounded-tr-lg rounded-br-lg shadow-md flex flex-col max-h-180">
+      <div className="search-result-word-container px-4 py-2 bg-slate-800 text-white flex-shrink-0">
+        <h2 className="text-lg">Search Results</h2>
       </div>
-      <ul className="divide-y divide-slate-200">
-        {searchResults.map((word) => {
-          const mainJapanese = word.japanese?.[0];
-          const isSelected = selectedWord?.id === word.id;
-
-          return (
-            <li 
-              key={word.id || `${word.word}-${word.reading}`} 
-              className={`cursor-pointer transition-colors duration-200 ${
-                isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-slate-50'
-              }`}
-              onClick={() => onWordSelect(word)}
-            >
-              <div className="p-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-xl font-semibold mb-1">
-                      {mainJapanese?.word || word.word}
-                      <span className="text-orange-500 ml-2">{mainJapanese?.reading || word.reading}</span>
-                    </p>
-                    <p className="text-slate-600">
-                      {word.senses?.[0]?.english_definitions?.slice(0, 2).join(', ') || 'No definition'}
-                      {word.senses?.[0]?.english_definitions?.length > 2 && '...'}
-                    </p>
+      <div className="flex-1 overflow-y-auto">
+        <ul className="divide-y divide-slate-200">
+          {searchResults.map((word) => {
+            // const mainJapanese = word.japanese?.[0];
+            const isSelected = selectedWord?.id === word.id;
+            return (
+              <li
+                key={word.id || `${word.word}-${word.reading}`}
+                className={`cursor-pointer transition-colors duration-200 ${
+                  isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-slate-50'
+                }`}
+                onClick={() => onWordSelect(word)}
+              >
+                <div className="search-result-indiviual-card min-h-23">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xl font-semibold mb-1">
+                        {word.word},
+                        <span className="text-orange-500 ml-2">{word.reading}</span>
+                      </p>
+                      <p className="text-slate-600">
+                        {Array.isArray(word.meaning)
+                          ? word.meaning.slice(0, 2).join(', ')
+                          : word.meaning || 'No definition'}
+                        {Array.isArray(word.meaning) && word.meaning.length > 2 && '...'}
+                      </p>
+                    </div>
+                    <div>
+                      {word.is_common && (
+                        <span className="word-list-details bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                          Common
+                        </span>
+                      )}
+                      {word.partOfSpeech && (
+                        <span className="word-list-details bg-blue-100 text-blue-800 text-sm px-3 py-3 mr-2 rounded">
+                          {word.partOfSpeech === 1 && 'Noun'}
+                          {word.partOfSpeech === 2 && 'Verb'}
+                          {word.partOfSpeech === 3 && 'Adjective'}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {word.is_common && (
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                      Common
-                    </span>
+                  {word.jlpt?.length > 0 && (
+                    <div className="mt-2">
+                      <span className="word-list-details bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
+                        JLPT N{word.jlpt[0].toUpperCase()}
+                      </span>
+                    </div>
                   )}
                 </div>
-                {word.jlpt?.length > 0 && (
-                  <div className="mt-2">
-                    <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
-                      {word.jlpt[0].toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 }

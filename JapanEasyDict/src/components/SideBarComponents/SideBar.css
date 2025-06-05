@@ -9,13 +9,13 @@ body {
   top: 0;
   left: 0;
   z-index: 998;
-  width: 200px;
+  width: 12%;
   height: 100vh;
   background: #151A2D;
   transition: all 0.4s ease;
 }
 .sidebar.collapsed {
-  width: 83px;
+  width: 5.5%;
   pointer-events: none; 
 }
 .sidebar .sidebar-header {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import WordList from './WordList';
 import WordDetail from './WordDetail';
+import './SearchResult.css';
 
 type Sense = {
   english_definitions: string[];
@@ -16,8 +17,8 @@ type WordData = {
   id?: string;
   word: string;
   reading: string;
-  partOfSpeech?: string;
-  meaning?: string;
+  partOfSpeech?: number;
+  meaning?: string[];
   is_common: boolean;
   jlpt: string[];
   senses: Sense[];
@@ -61,7 +62,7 @@ function SearchResultsNew({ searchResult, playPronunciation }: SearchResultsNewP
   // const sanitizedResults = sanitizeSearchResults(searchResult);
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+    <div className="search-result-container w-full min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex-grow">
       <main className="container mx-auto p-4 flex flex-col md:flex-row gap-6 mt-4">
         <section className="md:w-2/5">
           {error ? (
