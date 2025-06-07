@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import WordList from './WordList';
 import WordDetail from './WordDetail';
 import './SearchResult.css';
+import axios from 'axios';
 
 type Sense = {
   english_definitions: string[];
@@ -26,22 +27,10 @@ type WordData = {
 };
 
 interface SearchResultsNewProps {
-  searchResult: any[]; // incoming raw data
+  searchResult: any[];
   playPronunciation: (text: string) => void;
   translations?: any;
 }
-
-// const sanitizeSearchResults = (results: any[]): WordData[] => {
-//   return results.map((result) => ({
-//     ...result,
-//     senses: result.senses?.map((sense: any) => ({
-//       ...sense,
-//       parts_of_speech: sense.parts_of_speech ?? [],
-//     })) ?? [],
-//     jlpt: result.jlpt ?? [],
-//     japanese: result.japanese ?? [], // <-- Ensure it's at least an empty array
-//   }));
-// };
 
 function SearchResultsNew({ searchResult, playPronunciation }: SearchResultsNewProps) {
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
@@ -49,8 +38,17 @@ function SearchResultsNew({ searchResult, playPronunciation }: SearchResultsNewP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleWordSelect = (word: WordData) => {
+  const handleWordSelect = async (word: WordData) => {
     setSelectedWord(word);
+    try {
+      // Tăng view cho từ
+      await axios.post(`/api/word-views/${word.id}/increment`);
+      
+      // Tăng view tổng trong ngày
+      await axios.post(`/api/daily-views/increment`);
+    } catch (err) {
+      console.error("Failed to update view count", err);
+    }
   };
 
   const saveWord = (word: WordData) => {
@@ -58,8 +56,6 @@ function SearchResultsNew({ searchResult, playPronunciation }: SearchResultsNewP
       setSavedWords([...savedWords, word]);
     }
   };
-
-  // const sanitizedResults = sanitizeSearchResults(searchResult);
 
   return (
     <div className="search-result-container w-full min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex-grow">

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
-import { WORDS_DATA } from '../../data';
 import './Admin.css';
 
 interface WordItem {
+  id?: number;
   word: string;
   reading: string;
   meaning: string;
-  example: string;
+  example?: string;
+  jlpt?: string;
+  is_common?: boolean;
 }
 
 interface Props {
@@ -17,73 +19,116 @@ interface Props {
 
 const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
   const [wordsList, setWordsList] = useState<WordItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [newWord, setNewWord] = useState<WordItem>({ word: '', reading: '', meaning: '', example: '' });
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [newWord, setNewWord] = useState<WordItem>({
+    word: '',
+    reading: '',
+    meaning: '',
+    example: '',
+    is_common: false,
+  });
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editItem, setEditItem] = useState<WordItem>({ word: '', reading: '', meaning: '', example: '' });
+  const [editItem, setEditItem] = useState<WordItem>({
+    word: '',
+    reading: '',
+    meaning: '',
+    example: '',
+    is_common: false,
+  });
 
-  // Load words data
   useEffect(() => {
-    const savedData = localStorage.getItem(`words_${level}`);
-    if (savedData) {
-      setWordsList(JSON.parse(savedData));
-    } else {
-      setWordsList(WORDS_DATA[level as keyof typeof WORDS_DATA] || []);
-    }
+    fetchWordsList();
   }, [level]);
 
-  // Save to localStorage when data changes
-  useEffect(() => {
-    localStorage.setItem(`words_${level}`, JSON.stringify(wordsList));
-  }, [wordsList, level]);
+  const fetchWordsList = async () => {
+    try {
+      const response = await fetch(`/api/words/jlpt?jlpt_level=${level}`);
+      const data = await response.json();
+      setWordsList(data);
+    } catch (error) {
+      console.error('Error fetching Words list:', error);
+      onShowToast('Error loading words list');
+    }
+  };
 
-  // Handle adding new word
-  const handleAddWord = () => {
+  const handleAddWord = async () => {
     if (!newWord.word || !newWord.reading || !newWord.meaning) {
       onShowToast('Please fill all required fields');
       return;
     }
 
-    setWordsList([...wordsList, newWord]);
-    setNewWord({ word: '', reading: '', meaning: '', example: '' });
-    setShowAddForm(false);
-    onShowToast('✓ Word added successfully');
+    try {
+      const response = await fetch('/api/words', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...newWord, jlpt: level }),
+      });
+
+      const data: WordItem = await response.json();
+      setWordsList(prev => [...prev, data]);
+      setNewWord({ word: '', reading: '', meaning: '', example: '', is_common: false });
+      setShowAddForm(false);
+      onShowToast('✓ Word added successfully');
+    } catch (error) {
+      console.error('Error adding Word:', error);
+      onShowToast('Error adding word');
+    }
   };
 
-  // Handle editing word
   const startEditing = (index: number) => {
     setEditingIndex(index);
     setEditItem({ ...wordsList[index] });
   };
 
-  const saveEdit = () => {
-    if (editingIndex === null) return;
-    
+  const saveEdit = async () => {
+    if (editingIndex === null || !editItem.id) return;
+
     if (!editItem.word || !editItem.reading || !editItem.meaning) {
       onShowToast('Please fill all required fields');
       return;
     }
 
-    const updatedList = [...wordsList];
-    updatedList[editingIndex] = editItem;
-    setWordsList(updatedList);
-    setEditingIndex(null);
-    onShowToast('✓ Word updated successfully');
+    try {
+      const response = await fetch(`/api/words/${editItem.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...editItem, jlpt: level }),
+      });
+
+      const updatedWord = await response.json();
+      const updatedList = [...wordsList];
+      updatedList[editingIndex] = updatedWord;
+      setWordsList(updatedList);
+      setEditingIndex(null);
+      onShowToast('✓ Word updated successfully');
+    } catch (error) {
+      console.error('Error updating Word:', error);
+      onShowToast('Error updating word');
+    }
   };
 
   const cancelEdit = () => {
     setEditingIndex(null);
   };
 
-  // Handle deleting word
-  const handleDeleteWord = (index: number) => {
-    const updatedList = wordsList.filter((_, i) => i !== index);
-    setWordsList(updatedList);
-    onShowToast('✓ Word deleted successfully');
+  const handleDeleteWord = async (id?: number) => {
+    if (!id) return;
+
+    try {
+      await fetch(`/api/words/${id}`, { method: 'DELETE' });
+      setWordsList(prev => prev.filter(item => item.id !== id));
+      onShowToast('✓ Word deleted successfully');
+    } catch (error) {
+      console.error('Error deleting Word:', error);
+      onShowToast('Error deleting word');
+    }
   };
 
-  // Filter words based on search term
   const filteredWords = wordsList.filter(
     (item) =>
       item.word.includes(searchTerm) ||
@@ -106,7 +151,7 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
             />
             <Search className="admin-search-icon" />
           </div>
-          <button 
+          <button
             className="admin-add-button"
             onClick={() => setShowAddForm(!showAddForm)}
           >
@@ -116,7 +161,6 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
         </div>
       </div>
 
-      {/* Add Word Form */}
       {showAddForm && (
         <div className="admin-add-form admin-animate-fadeIn">
           <h3 className="admin-add-form-title">Add New Word</h3>
@@ -157,6 +201,15 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
                 onChange={(e) => setNewWord({ ...newWord, example: e.target.value })}
               />
             </div>
+            <div className="admin-form-field">
+              <label className="admin-form-label">Is Common</label>
+              <input
+                type="checkbox"
+                className="admin-form-checkbox"
+                checked={newWord.is_common}
+                onChange={(e) => setNewWord({ ...newWord, is_common: e.target.checked })}
+              />
+            </div>
           </div>
           <div className="admin-form-actions">
             <button
@@ -170,7 +223,6 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
         </div>
       )}
 
-      {/* Words List */}
       <div className="admin-words-table-container">
         <table className="admin-words-table">
           <thead>
@@ -179,22 +231,20 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
               <th className="admin-table-header-cell">Reading</th>
               <th className="admin-table-header-cell">Meaning</th>
               <th className="admin-table-header-cell">Example</th>
+              <th className="admin-table-header-cell">Is Common</th>
               <th className="admin-table-header-cell">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredWords.length === 0 ? (
               <tr>
-                <td colSpan={5} className="admin-empty-message">
+                <td colSpan={6} className="admin-empty-message">
                   {searchTerm ? 'No words found matching your search' : 'No words in this level yet'}
                 </td>
               </tr>
             ) : (
               filteredWords.map((item, index) => (
-                <tr 
-                  key={index} 
-                  className="admin-table-row"
-                >
+                <tr key={item.id ?? index} className="admin-table-row">
                   {editingIndex === index ? (
                     <>
                       <td className="admin-table-cell">
@@ -209,7 +259,7 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
                         <input
                           type="text"
                           className="admin-edit-input"
-                          value={editItem.reading}
+                          value={editItem.reading || ''}
                           onChange={(e) => setEditItem({ ...editItem, reading: e.target.value })}
                         />
                       </td>
@@ -225,8 +275,16 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
                         <input
                           type="text"
                           className="admin-edit-input"
-                          value={editItem.example}
+                          value={editItem.example || ''}
                           onChange={(e) => setEditItem({ ...editItem, example: e.target.value })}
+                        />
+                      </td>
+                      <td className="admin-table-cell">
+                        <input
+                          type="checkbox"
+                          className="admin-edit-checkbox"
+                          checked={editItem.is_common || false}
+                          onChange={(e) => setEditItem({ ...editItem, is_common: e.target.checked })}
                         />
                       </td>
                       <td className="admin-table-actions">
@@ -246,12 +304,11 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
                     </>
                   ) : (
                     <>
-                      <td className="admin-table-cell">
-                        <span className="admin-word-display">{item.word}</span>
-                      </td>
-                      <td className="admin-table-cell">{item.reading}</td>
+                      <td className="admin-table-cell">{item.word}</td>
+                      <td className="admin-table-cell">{item.reading || '-'}</td>
                       <td className="admin-table-cell">{item.meaning}</td>
-                      <td className="admin-table-cell admin-example-text">{item.example}</td>
+                      <td className="admin-table-cell admin-example-text">{item.example || '-'}</td>
+                      <td className="admin-table-cell">{item.is_common ? 'Yes' : 'No'}</td>
                       <td className="admin-table-actions">
                         <button
                           className="admin-action-button edit"
@@ -261,7 +318,7 @@ const WordsManagement: React.FC<Props> = ({ level, onShowToast }) => {
                         </button>
                         <button
                           className="admin-action-button delete"
-                          onClick={() => handleDeleteWord(index)}
+                          onClick={() => handleDeleteWord(item.id)}
                         >
                           <Trash2 className="admin-action-icon" />
                         </button>

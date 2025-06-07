@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
-const LoginInputField = ({
-  type,
-  name,
-  value,
-  onChange,
-  placeholder,
-  required,
-  icon,
-}) => {
+const LoginInputField = ({ type, name, value, onChange, placeholder, required, icon }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const getIcon = () => {
@@ -35,9 +27,8 @@ const LoginInputField = ({
         required={required}
         className="auth-input-field"
       />
-      
       {type === 'password' && (
-        <button 
+        <button
           type="button"
           className="auth-eye-button"
           onClick={() => setShowPassword(!showPassword)}

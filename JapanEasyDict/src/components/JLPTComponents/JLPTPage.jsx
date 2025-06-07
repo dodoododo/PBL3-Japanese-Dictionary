@@ -33,7 +33,7 @@ const JLPTPage = () => {
   const mockData = {
     vocabulary: {
       N1: { 
-        count: 2000, 
+        count: null, 
         items: [
           { word: '語彙', reading: 'ごい', meaning: 'Từ vựng', example: '語彙力を高める' },
           { word: '単語', reading: 'たんご', meaning: 'Từ đơn', example: '新しい単語を覚える' },
@@ -279,9 +279,6 @@ const JLPTPage = () => {
                       </div>
                       <div className="JLPTPage-level-info">
                         <h3 className="JLPTPage-level-name">JLPT {level}</h3>
-                        <p className="JLPTPage-level-count">
-                          {levelData.count} {selectedCategory.name.toLowerCase()}
-                        </p>
                       </div>
                     </div>
                     <div className="JLPTPage-level-arrow">
@@ -304,9 +301,6 @@ const JLPTPage = () => {
               <h2 className="JLPTPage-study-title">
                 {selectedCategory.name} - JLPT {selectedLevel}
               </h2>
-              <p className="JLPTPage-study-subtitle">
-                {mockData[selectedCategory.id][selectedLevel].count} {selectedCategory.name.toLowerCase()}
-              </p>
             </div>
 
             <div className="JLPTPage-options-grid">
@@ -346,7 +340,7 @@ const JLPTPage = () => {
             </div>
 
             {/* Sample Items Preview */}
-            <div className="JLPTPage-preview">
+            {/* <div className="JLPTPage-preview">
               <h4 className="JLPTPage-preview-title">Preview Content:</h4>
               <div className="JLPTPage-preview-items">
                 {mockData[selectedCategory.id][selectedLevel].items.map((item, index) => (
@@ -358,7 +352,7 @@ const JLPTPage = () => {
                   +{mockData[selectedCategory.id][selectedLevel].count - 3} more...
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
         )}
       </div>

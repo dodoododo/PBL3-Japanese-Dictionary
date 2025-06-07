@@ -15,14 +15,16 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = login(formData.email, formData.password);
+    const result = await login(formData.email, formData.password);
     if (result.success) {
       onLoginSuccess();
+      // Optionally store token in localStorage if using JWT
+      if (result.token) localStorage.setItem('token', result.token);
       window.location.reload();
       navigate(result.isAdmin ? '/admin' : '/');
     } else {
@@ -33,18 +35,18 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
   const slideVariants = {
     initial: (direction) => ({
       x: direction === 'left' ? 300 : -300,
-      opacity: 0
+      opacity: 0,
     }),
     animate: {
       x: 0,
       opacity: 1,
-      transition: { duration: 0.4 }
+      transition: { duration: 0.4 },
     },
     exit: (direction) => ({
       x: direction === 'left' ? -300 : 300,
       opacity: 0,
-      transition: { duration: 0.4 }
-    })
+      transition: { duration: 0.4 },
+    }),
   };
 
   return (
@@ -67,17 +69,6 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
 
             <h2 className="auth-form-title">Login</h2>
 
-            {/* <div className="auth-social-login">
-              <button className="auth-social-button">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="auth-social-icon" />
-                Google
-              </button>
-            </div>
-
-            <div className="auth-separator">
-              <span>hoặc</span>
-            </div> */}
-
             <form onSubmit={handleSubmit} className="auth-form">
               <LoginInputField
                 type="email"
@@ -97,14 +88,20 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
                 required
                 icon="lock"
               />
-              <a href="#" className="auth-forgot-link">Forgot Password?</a>
+              <a href="#" className="auth-forgot-link">
+                Forgot Password?
+              </a>
               {error && <div className="auth-error">{error}</div>}
-              <button type="submit" className="auth-submit-button">Login</button>
+              <button type="submit" className="auth-submit-button">
+                Login
+              </button>
             </form>
 
             <p className="auth-signup-prompt">
-              Don't have an account ? 
-              <a href="#" className="auth-signup-link" onClick={() => setIsLogin(false)}>Sign-up</a>
+              Don't have an account?{' '}
+              <a href="#" className="auth-signup-link" onClick={() => setIsLogin(false)}>
+                Sign-up
+              </a>
             </p>
           </motion.div>
         ) : (

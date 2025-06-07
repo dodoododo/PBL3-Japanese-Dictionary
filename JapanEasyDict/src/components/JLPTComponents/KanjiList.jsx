@@ -76,7 +76,7 @@ const KanjiList = () => {
       <h1 className="jlpt-title">JLPT {normalizedLevel} - Kanji List</h1>
 
       {loading ? (
-        <p>Đang tải dữ liệu...</p>
+        <p>Page is loading...</p>
       ) : (
         <>
           <div className="kanji-list-pagination">

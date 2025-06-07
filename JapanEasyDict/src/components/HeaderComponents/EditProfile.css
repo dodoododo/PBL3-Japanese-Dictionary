@@ -50,7 +50,8 @@
 .editprofile-profile-preview {
     display: block;
     align-items: center;
-    margin: 0 auto;
+    justify-content: center;
+    margin: auto;
     text-align: center;
     margin-bottom: 2rem;
 }
