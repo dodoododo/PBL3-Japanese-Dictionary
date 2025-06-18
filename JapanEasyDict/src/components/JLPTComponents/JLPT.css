@@ -634,13 +634,19 @@
   color: white;
 }
 
+
+
+.jlpt-title {
+  color:#20286780;
+  font-weight: bold;
+  font-size: 4rem;
+  margin: auto;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .jlpt-container {
     padding: 1rem;
-  }
-
-  .jlpt-title {
-    font-size: 2rem;
   }
 
   .level-grid {

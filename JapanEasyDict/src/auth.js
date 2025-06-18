@@ -1,31 +1,66 @@
+const API_URL = "http://localhost:8082/api/users";
+
 export const isAuthenticated = () => {
-  return localStorage.getItem('isAuthenticated') === 'true';
+  return localStorage.getItem("isAuthenticated") === "true";
 };
 
 export const isAdmin = () => {
-  return localStorage.getItem('isAdmin') === 'true';
+  return localStorage.getItem("isAdmin") === "true";
 };
 
-export const login = (email, password) => {
-  const demoUsers = [
-    { email: 'admin@japaneasy.com', password: 'admin123', isAdmin: true },
-    { email: 'user@japaneasy.com', password: 'user123', isAdmin: false },
-  ];
+export const register = async (email, password) => {
+  try {
+    const response = await fetch(`${API_URL}/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: email, // nếu backend yêu cầu username
+        email,
+        password,
+      }),
+    });
 
-  const user = demoUsers.find(
-    (u) => u.email === email && u.password === password
-  );
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Đăng ký thất bại");
+    }
 
-  if (user) {
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('isAdmin', user.isAdmin.toString());
-    return { success: true, isAdmin: user.isAdmin };
-  } else {
-    return { success: false, message: 'Email hoặc mật khẩu không đúng.' };
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const login = async (email, password) => {
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("isAdmin", data.role === 2 ? "true" : "false");
+      localStorage.setItem("userId", data.id.toString()); // Store user ID
+      return { success: true, isAdmin: data.role === 2, userId: data.id };
+    } else {
+      throw new Error(data.message || "Đăng nhập thất bại");
+    }
+  } catch (error) {
+    return { success: false, message: error.message };
   }
 };
 
 export const logout = () => {
-  localStorage.removeItem('isAuthenticated');
-  localStorage.removeItem('isAdmin');
+  localStorage.removeItem("isAuthenticated");
+  localStorage.removeItem("isAdmin");
+  localStorage.removeItem("userId");
 };

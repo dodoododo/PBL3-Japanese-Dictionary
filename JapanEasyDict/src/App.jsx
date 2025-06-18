@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronDown, Globe, Search, Volume2 } from 'lucide-react';
-import { JLPT_DATA, EXAMPLE_SENTENCES, POPULAR_WORDS } from './data';
-import { isAuthenticated, isAdmin,  login, logout} from './auth';
+import { JLPT_DATA, EXAMPLE_SENTENCES } from './data';
+import { isAuthenticated, isAdmin, login, logout } from './auth';
 import Header from './components/HeaderComponents/Header';
 import LoginForm from './components/LoginFormComponents/LoginForm';
 import Sidebar from './components/SideBarComponents/SideBar';
@@ -13,9 +13,8 @@ import AdminPage from './components/AdminComponents/Admin';
 import SearchResultNew from "./components/SearchResultsComponents/SearchResultNew";
 import Footer from './components/FooterComponents/Footer.jsx';
 import DnDGame from './components/views/DnDGame.jsx';
-import * as wanakana from 'wanakana';
 import EditProfile from './components/HeaderComponents/EditProfile.jsx';
-import './auth.js'
+import './auth.js';
 import Kana from './components/KanaComponents/Kana.jsx';
 
 function App() {
@@ -30,6 +29,7 @@ function App() {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [popularWords, setPopularWords] = useState([]); // New state for popular words
   const levelDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
 
@@ -110,6 +110,37 @@ function App() {
     checkAuth();
   }, []);
 
+  // Fetch popular words
+  useEffect(() => {
+    const fetchPopularWords = async () => {
+      try {
+        // Step 1: Fetch top 18 word views
+        const wordViewsResponse = await fetch('http://localhost:8082/api/word-views/top');
+        if (!wordViewsResponse.ok) {
+          throw new Error('Failed to fetch top word views');
+        }
+        const wordViews = await wordViewsResponse.json();
+
+        // Step 2: Extract wordIds and fetch corresponding Word details
+        const wordIds = wordViews.map(view => view.wordId);
+        const wordsResponse = await fetch('http://localhost:8082/api/words/by-ids', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(wordIds),
+        });
+        if (!wordsResponse.ok) {
+          throw new Error('Failed to fetch word details');
+        }
+        const words = await wordsResponse.json();
+        setPopularWords(words);
+      } catch (err) {
+        console.error('Failed to fetch popular words:', err);
+      } 
+    };
+
+    fetchPopularWords();
+  }, []);
+
   const playPronunciation = (word) => {
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = 'ja-JP';
@@ -126,7 +157,7 @@ function App() {
   
     try {
       // 1. Gọi backend
-      const response = await fetch(`http://localhost:8082/api/words/?q=${searchTerm}`);
+      const response = await fetch(`http://localhost:8082/api/words?q=${searchTerm}`);
   
       if (!response.ok) {
         throw new Error('Không tìm thấy trong DB');
@@ -139,9 +170,9 @@ function App() {
         setNoResults(true);
       }
     } catch (error) {
-        setNoResults(true);
-        console.error('Handle Search error: ', error);
-      } finally {
+      setNoResults(true);
+      console.error('Handle Search error: ', error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -214,29 +245,30 @@ function App() {
               <Routes>
                 <Route path="/" element={
                   !selectedLevel && !searchResult && !isLoading && !noResults && (
-                    <div className = "welcome-page">
+                    <div className="welcome-page">
                       <div className="welcome">
                         <h1>{translations.welcome}</h1>
                         <p>{translations.welcomeDesc}</p>
                       </div>
                       <section>
                         <h2>{translations.popularWords}</h2>
-                        <div className="kanji-grid">
-                          {POPULAR_WORDS.map((word, index) => (
-                            <div
-                              key={index}
-                              className="kanji-card"
-                              onClick={() => {
-                                setSearchTerm(word.word);
-                                handleSearch(new Event('submit'));
-                              }}
-                            >
-                              <div className="kanji-character">{word.word}</div>
-                              <div>{word.reading} - {word.meaning}</div>
-                            </div>
-                          ))}
-                        </div>
+                          <div className="kanji-grid">
+                            {popularWords.map((word, index) => (
+                              <div
+                                key={index}
+                                className="kanji-card"
+                                onClick={() => {
+                                  setSearchTerm(word.word);
+                                  handleSearch(new Event('submit'));
+                                }}
+                              >
+                                <div className="kanji-character">{word.word}</div>
+                                <div>{word.reading} - {word.meaning}</div>
+                              </div>
+                            ))}
+                          </div>
                       </section>
+
                     </div>
                   )
                 } />
@@ -267,8 +299,6 @@ function App() {
                   translations={translations} 
                 />
               )} 
-              
-              
             </div>
           </main>
         </div>
