@@ -5,7 +5,6 @@ import { Github, Facebook, Mail, ExternalLink, Heart, Code, BookOpen, Zap } from
 const Footer = () => {
   const quickLinks = [
     { name: 'JLPT Levels', path: '/jlpt' },
-    { name: 'Flashcards', path: '/flashcards/N5' },
     { name: 'Hiragana', path: '/hiragana' },
     { name: 'Katakana', path: '/katakana' },
     { name: 'Learning Games', path: '/game' }

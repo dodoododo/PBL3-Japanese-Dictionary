@@ -3,11 +3,12 @@ import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoginInputField from './LoginInputField';
 import './LoginForm.css';
-import { login } from '../../auth';
+import { logout, login } from '../../auth';
 import { useNavigate } from 'react-router-dom';
 import RegisterForm from './RegisterForm';
 
 const LoginForm = ({ onLoginSuccess, onClose }) => {
+  logout();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -26,7 +27,7 @@ const LoginForm = ({ onLoginSuccess, onClose }) => {
       // Optionally store token in localStorage if using JWT
       if (result.token) localStorage.setItem('token', result.token);
       window.location.reload();
-      navigate(result.isAdmin ? '/admin' : '/');
+      navigate('/');
     } else {
       setError(result.message);
     }

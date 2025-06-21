@@ -47,7 +47,7 @@ function WordList({
     );
   }
 
-  if (searchResults.length === 0) {
+  if (!searchResults || searchResults.length === 0) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-md">
         <p className="text-slate-600 text-center">No results found</p>
