@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, ChevronLeft, Menu, 
          LayoutDashboard, Calendar, Bell, 
-         BookMarked, Settings,
+         Bookmark, Settings,
          HelpCircle, LogOut, Clipboard, NotepadText, GraduationCap, Joystick } from 'lucide-react';         
 import { Link } from 'react-router-dom';
 import './Sidebar.css';
@@ -78,6 +78,13 @@ const Sidebar = ({ onToggle }) => {
               <Link to="/jlpt" className="nav-link">
                 <GraduationCap className="nav-icon" />
                 <span className="nav-label">JLPT</span>
+              </Link>
+            </li>
+
+            <li className="nav-item">
+              <Link to="/bookmark" className="nav-link">
+                <Bookmark className="nav-icon"/>
+                <span className="nav-label">Bookmark</span>
               </Link>
             </li>
 

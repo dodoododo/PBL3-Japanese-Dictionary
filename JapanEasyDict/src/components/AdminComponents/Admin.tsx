@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   BarChart3, ScrollText, Book, Users, Settings, LogOut
 } from 'lucide-react';
-import { logout, isAuthenticated } from '../../auth';
+import { isAuthenticated, isAdmin } from '../../auth';
 import Dashboard from './Dashboard';
 import KanjiManagement from './KanjiManagement';
 import WordsManagement from './WordsManagement';
@@ -20,12 +20,6 @@ const Admin: React.FC = () => {
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
   }, []);
-
-  // Handle logout
-  const handleLogout = () => {
-    logout();
-    setIsLoggedIn(false);
-  };
 
   // Show toast notification
   const showToast = (message: string) => {
@@ -54,6 +48,7 @@ const Admin: React.FC = () => {
   };
 
   return (
+  isAuthenticated() && isAdmin() ? (
     <div className="admin-container">
       <div className="admin-container-inner">
         {/* Header */}
@@ -62,7 +57,7 @@ const Admin: React.FC = () => {
             <h1 className="admin-header-title">Japanese Admin Dashboard</h1>
             <p className="admin-header-subtitle">Manage your Japanese learning content</p>
           </div>
-          
+
           {(activeSection === 'kanji' || activeSection === 'words') && (
             <div className="admin-level-selector-container">
               <select
@@ -86,35 +81,34 @@ const Admin: React.FC = () => {
             <div>
               <h2 className="admin-sidebar-title">Navigation</h2>
               <div className="admin-nav-buttons">
-                <button 
+                <button
                   className={`admin-nav-button ${activeSection === 'dashboard' ? 'active' : ''}`}
                   onClick={() => setActiveSection('dashboard')}
                 >
                   <BarChart3 className="admin-nav-button-icon" />
                   <span>Dashboard</span>
                 </button>
-                <button 
+                <button
                   className={`admin-nav-button ${activeSection === 'kanji' ? 'active' : ''}`}
                   onClick={() => setActiveSection('kanji')}
                 >
                   <ScrollText className="admin-nav-button-icon" />
                   <span>Manage Kanji</span>
                 </button>
-                <button 
+                <button
                   className={`admin-nav-button ${activeSection === 'words' ? 'active' : ''}`}
                   onClick={() => setActiveSection('words')}
                 >
                   <Book className="admin-nav-button-icon" />
                   <span>Manage Words</span>
                 </button>
-                <button 
+                <button
                   className={`admin-nav-button ${activeSection === 'users' ? 'active' : ''}`}
                   onClick={() => setActiveSection('users')}
                 >
                   <Users className="admin-nav-button-icon" />
                   <span>User Data</span>
                 </button>
-
               </div>
             </div>
           </div>
@@ -125,7 +119,7 @@ const Admin: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Toast Notification */}
       {toast && (
         <div className="admin-toast admin-animate-fadeIn">
@@ -133,7 +127,11 @@ const Admin: React.FC = () => {
         </div>
       )}
     </div>
-  );
+  ) : (
+    <div>You dont have permission to enter this site</div>
+  )
+);
+
 };
 
 export default Admin;

@@ -1,8 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  BookOpen, ChevronDown, Globe, Search, Volume2,
-  LogIn, LogOut, Shield
+  BookOpen, ChevronDown, Search, LogIn, LogOut, Shield
 } from 'lucide-react';
 import { isAuthenticated, logout } from '../../auth';
 import './Header.css';
@@ -16,24 +15,20 @@ const Header = ({
   setSearchTerm,
   handleSearch,
   isLoading,
-  language,
-  setLanguage,
-  languageDropdownOpen,
-  setLanguageDropdownOpen,
   selectedLevel,
   setSelectedLevel,
   levelDropdownOpen,
   setLevelDropdownOpen,
   handleReset,
-  translations,
-  onLoginClick
+  onLoginClick,
+  isLoggedIn,
+  setIsLoggedIn,
+  isAdmin,
+  setIsAdmin
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const levelDropdownRef = useRef(null);
-  const languageDropdownRef = useRef(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [userData, setUserData] = useState({
     username: '',
@@ -70,7 +65,7 @@ const Header = ({
       setIsLoggedIn(false);
       setIsAdmin(false);
     }
-  }, [location.pathname]);
+  }, [location.pathname, setIsLoggedIn, setIsAdmin]);
 
   useEffect(() => {
     if (!location.pathname.includes('/kanji/')) {
@@ -81,6 +76,7 @@ const Header = ({
   const handleLevelSelect = (level) => {
     setSelectedLevel(level);
     setLevelDropdownOpen(false);
+    handleReset();
     navigate(`/kanji/${level.toLowerCase()}`);
   };
 
@@ -88,16 +84,19 @@ const Header = ({
     logout();
     setIsLoggedIn(false);
     setIsAdmin(false);
+    handleReset();
     navigate('/');
   };
 
   const handleAdminClick = () => {
     setUserDropdownOpen(false);
+    handleReset();
     navigate('/admin');
   };
 
   const handleEditProfileClick = () => {
     setUserDropdownOpen(false);
+    handleReset();
     navigate('/edit-profile');
   };
 
@@ -109,7 +108,7 @@ const Header = ({
             <BookOpen className="logo-icon" />
             <div>
               <h1 className="logo-text"><span>Japan</span>Easy</h1>
-              <p>日本語辞書</p>
+              <p>Japanese Dictionary</p>
             </div>
           </a>
 
@@ -117,7 +116,7 @@ const Header = ({
             <input
               type="text"
               className="search-input"
-              placeholder={translations.searchPlaceholder}
+              placeholder="Search for a word..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={isLoading}
@@ -191,7 +190,7 @@ const Header = ({
             ) : (
               <button className="login-button" onClick={onLoginClick}>
                 <LogIn className="login-icon" />
-                {language === 'english' ? 'Login' : 'Đăng nhập'}
+                Login
               </button>
             )}
           </div>

@@ -1,75 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Download, PlayCircle, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Search, Download, PlayCircle, Eye, EyeOff, Trash2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
+import axios from 'axios';
 import './VocabularyList.css';
 
-const VocabularyList = ({ 
-  category, 
-  level, 
-  data, 
-  onBack, 
-  onStartFlashcards, 
-  onExportPDF 
-}) => {
-  const { level: urlLevel } = useParams(); // Get level from URL
-  const navigate = useNavigate(); // Added for navigation
+const BookmarkPage = ({ onBack }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [showMeaning, setShowMeaning] = useState(true);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [kanjiList, setKanjiList] = useState(data || []); // Initialize with prop data
+  const [savedWords, setSavedWords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const normalizedLevel = (urlLevel || level)?.toUpperCase();
-  const numericLevel = parseInt(normalizedLevel?.replace('N', ''), 10);
+  const userId = localStorage.getItem('userId');
 
-  // Fetch data based on category (Kanji or Vocabulary)
+  // Fetch saved words and their details
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSavedWords = async () => {
+      if (!userId) {
+        setError('Please log in to view saved words.');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        let apiData;
-        if (category.name === 'Vocabulary') {
-          const response = await fetch(`http://localhost:8082/api/words/jlpt?jlpt_level=${numericLevel}`);
-          apiData = await response.json();
-          // Map Word API data to match VocabularyList expected format
-          apiData = apiData.map(word => ({
-            word: word.word,
-            reading: word.reading || '',
-            meaning: word.meaning || '',
-            example: word.example || '' // Include example if available, empty string if not
-          }));
-        } else {
-          const response = await fetch(`http://localhost:8082/api/kanji?jlpt_level=${numericLevel}`);
-          apiData = await response.json();
-          // Map Kanji API data to match VocabularyList expected format
-          apiData = apiData.map(kanji => ({
-            word: kanji.kanji,
-            reading: `${kanji.onyomi || ''}${kanji.onyomi && kanji.kunyomi ? ', ' : ''}${kanji.kunyomi || ''}`,
-            meaning: kanji.meaning,
-            example: kanji.example || '' // Include example if available, empty string if not
-          }));
+        // Step 1: Fetch saved words for the user
+        const savedWordsResponse = await axios.get(`http://localhost:8082/api/saved-words/user/${userId}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        console.log('Saved words response:', savedWordsResponse.data);
+        const savedWordsData = savedWordsResponse.data;
+
+        if (!savedWordsData || savedWordsData.length === 0) {
+          setSavedWords([]);
+          setLoading(false);
+          return;
         }
-        setKanjiList(apiData);
-      } catch (error) {
-        console.error('Lỗi khi gọi API:', error);
-        // Fallback to prop data if API fails
-        setKanjiList(data || []);
+
+        // Step 2: Extract word IDs and fetch word details
+        const wordIds = savedWordsData.map(word => word.id.wordId);
+        console.log('Word IDs:', wordIds);
+        const wordsResponse = await axios.post(`http://localhost:8082/api/words/by-ids`, wordIds, {
+          headers: { 'Content-Type': 'application/json' }
+        });
+        console.log('Words response:', wordsResponse.data);
+        const wordsData = wordsResponse.data;
+
+        // Map word data to match VocabularyList format
+        const mappedData = wordsData.map(word => ({
+          id: word.id,
+          word: word.word || 'N/A',
+          reading: word.reading || '',
+          meaning: word.meaning || '',
+          example: word.example || ''
+        }));
+
+        setSavedWords(mappedData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching saved words:', err);
+        setError('Failed to load saved words.');
       } finally {
         setLoading(false);
       }
     };
 
-    if (!isNaN(numericLevel)) {
-      fetchData();
-    } else {
-      setKanjiList(data || []); // Use prop data if level is invalid
-      setLoading(false);
-    }
-  }, [numericLevel, data, category.name]);
+    fetchSavedWords();
+  }, [userId]);
 
   // Filter data based on search term
-  const filteredData = kanjiList.filter(item => 
+  const filteredData = savedWords.filter(item => 
     item.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.meaning.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.reading && item.reading.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -93,18 +96,33 @@ const VocabularyList = ({
     }
   };
 
+  const handleDeleteWord = async (wordId) => {
+    if (!userId) {
+      alert('Please log in to delete saved words.');
+      return;
+    }
+
+    try {
+      await axios.delete(`http://localhost:8082/api/saved-words/user/${userId}/word/${wordId}`);
+      setSavedWords(prev => prev.filter(word => word.id !== wordId));
+      setSelectedItems(prev => prev.filter(index => filteredData[index]?.id !== wordId));
+      alert('Word removed successfully!');
+    } catch (err) {
+      console.error('Error deleting word:', err);
+      alert('Failed to remove word.');
+    }
+  };
+
   const handleExportSelected = () => {
     const selectedData = selectedItems.map(index => filteredData[index]);
     
-    // Create a hidden HTML element for PDF generation
     const element = document.createElement('div');
     element.style.fontFamily = 'Arial, sans-serif';
     element.style.padding = '15mm';
-    element.style.width = '180mm'; // Adjusted to fit A4 with margins
-    element.style.minHeight = '267mm'; // Adjusted for A4 height with margins
-    element.style.fontSize = '14px'; // Increased font size for larger table
+    element.style.width = '180mm';
+    element.style.minHeight = '267mm';
+    element.style.fontSize = '14px';
 
-    // Add CSS for table and page break control
     const style = document.createElement('style');
     style.textContent = `
       @layer base {
@@ -113,14 +131,14 @@ const VocabularyList = ({
           width: 100%; 
           border-collapse: collapse; 
           break-inside: avoid; 
-          margin: 20px 0; // Added margin for spacing around table
+          margin: 20px 0;
         }
         th, td { 
           border: 1px solid #000; 
-          padding: 12px; // Increased padding for more spacing around words
+          padding: 12px; 
           text-align: left; 
           break-inside: avoid; 
-          line-height: 1.5; // Added line height for better readability
+          line-height: 1.5;
         }
         tr { 
           break-inside: avoid; 
@@ -129,23 +147,19 @@ const VocabularyList = ({
         th { 
           background-color: #f0f0f0; 
           font-weight: bold; 
-          font-size: 16px; // Larger font for headers
+          font-size: 16px;
         }
       `;
     element.appendChild(style);
 
-    // Add title
     const title = document.createElement('h1');
-    title.textContent = `${category.name} - JLPT ${normalizedLevel}`;
+    title.textContent = 'Saved Words';
     title.style.textAlign = 'center';
-    title.style.marginBottom = '20px'; // Increased for more spacing
-    title.style.fontSize = '18px'; // Slightly larger title
+    title.style.marginBottom = '20px';
+    title.style.fontSize = '18px';
     element.appendChild(title);
 
-    // Create table
     const table = document.createElement('table');
-    
-    // Table header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     ['Word', 'Reading', 'Meaning'].forEach(headerText => {
@@ -156,7 +170,6 @@ const VocabularyList = ({
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    // Table body
     const tbody = document.createElement('tbody');
     selectedData.forEach(item => {
       const row = document.createElement('tr');
@@ -170,28 +183,20 @@ const VocabularyList = ({
     table.appendChild(tbody);
     element.appendChild(table);
 
-    // Configure html2pdf options
     const opt = {
-      margin: [15, 15], // Consistent margins
-      filename: `${category.name}_JLPT_${normalizedLevel}.pdf`,
+      margin: [15, 15],
+      filename: `Saved_Words.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // Generate and download PDF
     html2pdf().from(element).set(opt).save();
-
-    // Call the onExportPDF prop if provided
-    if (onExportPDF) {
-      onExportPDF(selectedData);
-    }
   };
 
   const handleFlashcardsSelected = () => {
     const selectedData = selectedItems.map(index => filteredData[index]);
-    // Navigate to FlashcardPage with selected data
-    navigate(`/flashcards/${normalizedLevel}`, { state: { selectedData } });
+    navigate('/flashcards/saved', { state: { selectedData } });
   };
 
   return (
@@ -199,17 +204,10 @@ const VocabularyList = ({
       <div className="VocabularyList-content">
         {/* Header */}
         <div className="VocabularyList-header">
-          <button onClick={onBack} className="VocabularyList-back-button">
-            <ArrowLeft size={20} />
-            <span>Return</span>
-          </button>
-          
           <div className="VocabularyList-title-section">
-            <h1 className="VocabularyList-title">
-              {category.name} - JLPT {normalizedLevel}
-            </h1>
+            <h1 className="VocabularyList-title">Saved Words</h1>
             <p className="VocabularyList-subtitle">
-              {loading ? 'Loading...' : `${filteredData.length} / ${kanjiList.length} Items`}
+              {loading ? 'Loading...' : `${filteredData.length} / ${savedWords.length} Items`}
             </p>
           </div>
         </div>
@@ -221,7 +219,7 @@ const VocabularyList = ({
               <Search size={20} className="VocabularyList-search-icon" />
               <input
                 type="text"
-                placeholder={category.name === 'Vocabulary' ? 'Search Word...' : 'Search Kanji...'}
+                placeholder="Search Saved Words..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="VocabularyList-search-input"
@@ -278,13 +276,21 @@ const VocabularyList = ({
         {/* List */}
         {loading ? (
           <div className="VocabularyList-empty">
-            <p>Give me a minute...</p>
+            <p>Loading saved words...</p>
+          </div>
+        ) : error ? (
+          <div className="VocabularyList-empty">
+            <p>{error}</p>
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="VocabularyList-empty">
+            <p>No saved words found.</p>
           </div>
         ) : (
           <div className="VocabularyList-grid">
             {filteredData.map((item, index) => (
               <div
-                key={index}
+                key={item.id}
                 className={`VocabularyList-item ${selectedItems.includes(index) ? 'selected' : ''}`}
                 onClick={() => handleSelectItem(index)}
               >
@@ -314,15 +320,20 @@ const VocabularyList = ({
                       <strong>Example:</strong> {item.example}
                     </div>
                   )}
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteWord(item.id);
+                    }}
+                    className="VocabularyList-delete-button"
+                    title="Remove from saved words"
+                  >
+                    <Trash2 size={18} className="text-red-500" />
+                  </button>
                 </div>
               </div>
             ))}
-          </div>
-        )}
-
-        {filteredData.length === 0 && !loading && (
-          <div className="VocabularyList-empty">
-            <p>Không tìm thấy kết quả nào cho "{searchTerm}"</p>
           </div>
         )}
       </div>
@@ -330,4 +341,4 @@ const VocabularyList = ({
   );
 };
 
-export default VocabularyList;
+export default BookmarkPage;
